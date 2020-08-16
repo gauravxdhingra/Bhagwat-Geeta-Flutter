@@ -1,3 +1,4 @@
+import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
@@ -20,28 +21,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() async {
     if (!init) {
-      String url = "https://bhagavadgita.io";
-      final response = await http.get(url);
-      dom.Document document = parser.parse(response.body);
-
-      List chapterNames = [];
-      document
-          .getElementsByClassName("card-header-title chapter-name")
-          .forEach((element) {
-        chapterNames.add(element.text);
-      });
-
-      List chapterMeaning = [];
-      document.getElementsByClassName("chapter-meaning").forEach((element) {
-        chapterMeaning.add(element.text);
-      });
-
-      for (int i = 0; i < chapterNames.length; i++) {
-        chapters[chapterNames[i]] = chapterMeaning[i];
-      }
-
-      print(chapters);
+      String url = "https://bhagavadgita.io/chapter/1/?page=1";
+      //  "https://bhagavadgita.io";
+      final provider = Provider.of<Scraper>(context);
+      final document = await provider.getWebpage(url);
+      // chapters = await provider.getChapters(document);
+      // print(provider.getChapterDetails(document));
+      // print(provider.getTotalPagesChapter(document).toString());
+      // print(chapters);
     }
+
     setState(() {
       _isLoading = false;
       init = true;
@@ -53,9 +42,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // TODO Go To Chapter and Verse
-        // TODO Language
-      ),
+          // TODO Go To Chapter and Verse
+          // TODO Language
+          ),
     );
   }
 }
