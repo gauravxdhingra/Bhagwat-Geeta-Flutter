@@ -15,17 +15,32 @@ class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
   bool init = false;
 
-  dom.Document printdoc;
+  Map<String, String> chapters = {};
 
   @override
   void didChangeDependencies() async {
     if (!init) {
-      String url = "https://bhagavadgita.io/";
+      String url = "https://bhagavadgita.io";
       final response = await http.get(url);
       dom.Document document = parser.parse(response.body);
-      printdoc = document;
-      print(url);
-      print(document);
+
+      List chapterNames = [];
+      document
+          .getElementsByClassName("card-header-title chapter-name")
+          .forEach((element) {
+        chapterNames.add(element.text);
+      });
+
+      List chapterMeaning = [];
+      document.getElementsByClassName("chapter-meaning").forEach((element) {
+        chapterMeaning.add(element.text);
+      });
+
+      for (int i = 0; i < chapterNames.length; i++) {
+        chapters[chapterNames[i]] = chapterMeaning[i];
+      }
+
+      print(chapters);
     }
     setState(() {
       _isLoading = false;
@@ -36,8 +51,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Text(),
-    );
+    return Scaffold();
   }
 }
