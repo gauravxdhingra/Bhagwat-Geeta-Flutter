@@ -45,14 +45,46 @@ class Scraper with ChangeNotifier {
     return document.getElementsByTagName("p")[0].text;
   }
 
-  Future<Map<String, String>> getVersesFromPage(dom.Document document) async {
-    Map<String, String> verses = {};
+  List<Map<String, String>> getVersesFromPage(dom.Document document) {
+    List<Map<String, String>> verses = [];
 
     document.getElementsByClassName("card-body").forEach((element) {
-      verses[element.getElementsByTagName("h4")[0].text] =
-          element.getElementsByTagName("p")[0].text;
+      verses.add({
+        'verseNo': element.getElementsByTagName("h4")[0].text,
+        'verse': element.getElementsByTagName("p")[0].text,
+        'url': element.getElementsByTagName("a")[2].attributes["href"],
+      });
     });
     return verses;
+  }
+
+  Map<String, String> getFullVerse(dom.Document document) {
+    Map verse = {};
+    String title = "";
+    String verseSanskrit = "";
+    String transliteration = "";
+    String wordMeanings = "";
+    String translation = "";
+
+    title = document.getElementsByClassName("font-up font-bold mt-2")[0].text;
+    verseSanskrit = document.getElementsByClassName("verse-sanskrit")[0].text;
+    transliteration =
+        document.getElementsByClassName("verse-transliteration")[0].text;
+    wordMeanings = document.getElementsByClassName("verse-word")[0].text;
+    translation = document.getElementsByClassName("verse-meaning")[0].text;
+
+    // No Transliteration for Hindi
+    // शब्दार्थ   word meanings
+    // अनुवाद   translation
+
+    verse = {
+      title: title,
+      verseSanskrit: verseSanskrit,
+      transliteration: transliteration,
+      wordMeanings: wordMeanings,
+      translation: translation,
+    };
+    return verse;
   }
 
   

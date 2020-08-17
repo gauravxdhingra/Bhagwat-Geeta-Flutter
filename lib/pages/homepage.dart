@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       chapters = await provider.getChapters(document);
       print(provider.getChapterDetails(document));
       print(provider.getTotalPagesChapter(document).toString());
-      provider.getVersesFromPage(document);
+      print(provider.getVersesFromPage(document));
       print(chapters);
     }
 
