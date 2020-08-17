@@ -21,14 +21,17 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() async {
     if (!init) {
-      String url = "https://bhagavadgita.io/chapter/1/?page=1";
-      //  "https://bhagavadgita.io";
+      String url =
+          // "https://bhagavadgita.io";
+          "https://bhagavadgita.io/chapter/1/?page=1";
+
       final provider = Provider.of<Scraper>(context);
       final document = await provider.getWebpage(url);
-      // chapters = await provider.getChapters(document);
-      // print(provider.getChapterDetails(document));
-      // print(provider.getTotalPagesChapter(document).toString());
-      // print(chapters);
+      chapters = await provider.getChapters(document);
+      print(provider.getChapterDetails(document));
+      print(provider.getTotalPagesChapter(document).toString());
+      provider.getVersesFromPage(document);
+      print(chapters);
     }
 
     setState(() {
