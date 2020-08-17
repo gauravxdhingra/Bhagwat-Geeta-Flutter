@@ -1,8 +1,8 @@
-import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
-import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
+
+import '../provider/scraper.dart';
+import 'verse_view_Page.dart';
 
 class ChapterViewPage extends StatefulWidget {
   ChapterViewPage({Key key}) : super(key: key);
@@ -68,41 +68,81 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Text(chapterNumber.toString() + " " + chapterHeading),
-            Text(chapterMeaning),
-            Text(chapterDetails),
-            if (_isLoading) CircularProgressIndicator(),
-            if (!_isLoading)
-              for (int i = 0; i < verses.length; i++)
-                InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, VerseViewPage.routeName,
-                        arguments: {
-                          "verseUrl": verses[i]["url"],
-                        });
-                  },
-                  child: Container(
-                    child: Column(
-                      children: [
-                        Text(verses[i]["verseNo"]),
-                        Text(verses[i]["verse"]),
-                      ],
+    return SafeArea(
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: MediaQuery.of(context).size.height / 3.9,
+              pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding:
+                    EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                centerTitle: false,
+                collapseMode: CollapseMode.parallax,
+                title: Container(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 3,
+                    horizontal: 6,
+                  ),
+                  child: Text(
+                    "category",
+                    style: TextStyle(
+                      fontSize: 15,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                    textAlign: TextAlign.center,
                   ),
                 ),
-            if (currentPage < pages)
-              FlatButton(
-                child: Text("Load More"),
-                onPressed: () async {
-                  await getNextPage(chapterNumber, currentPage + 1, provider);
-                  currentPage += 1;
-                },
+                background: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  child: Container(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  Text(chapterNumber.toString() + " " + chapterHeading),
+                  Text(chapterMeaning),
+                  Text(chapterDetails),
+                  if (_isLoading) CircularProgressIndicator(),
+                  if (!_isLoading)
+                    for (int i = 0; i < verses.length; i++)
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, VerseViewPage.routeName,
+                              arguments: {
+                                "verseUrl": verses[i]["url"],
+                              });
+                        },
+                        child: Container(
+                          child: Column(
+                            children: [
+                              Text(verses[i]["verseNo"]),
+                              Text(verses[i]["verse"]),
+                            ],
+                          ),
+                        ),
+                      ),
+                  if (currentPage < pages)
+                    FlatButton(
+                      child: Text("Load More"),
+                      onPressed: () async {
+                        await getNextPage(
+                            chapterNumber, currentPage + 1, provider);
+                        currentPage += 1;
+                      },
+                    ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

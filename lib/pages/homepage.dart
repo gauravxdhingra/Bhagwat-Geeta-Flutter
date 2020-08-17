@@ -44,54 +44,110 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: _isLoading
-          ? CircularProgressIndicator()
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text("Go To Chapter and Verse"),
+    return SafeArea(
+      child: Scaffold(
+        drawer: Drawer(
+          child: Column(
+            children: [
+              ListTile(),
+              ListTile(),
+              ListTile(),
+              ListTile(),
+            ],
+          ),
+        ),
+        body: _isLoading
+            ? CircularProgressIndicator()
+            : CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: MediaQuery.of(context).size.height / 3,
+                    pinned: true,
+                    actions: [
+                      IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {},
+                      ),
                     ],
-                  ),
-                  Text("Chapters"),
-                  SizedBox(height: 20),
-                  for (int i = 0; i < chapters.length; i++)
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, ChapterViewPage.routeName,
-                            arguments: {
-                              "chapterHead": chapters.keys.toList()[i],
-                              "chapterMeaning":
-                                  chapters[chapters.keys.toList()[i]],
-                              "chapterNumber": i + 1,
-                            });
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              chapters.keys.toList()[i],
-                              style: Themes.homeChapterHead,
-                            ),
-                            Text(
-                              chapters[chapters.keys.toList()[i]],
-                              style: Themes.homeChapterMeaning,
-                            ),
-                            SizedBox(height: 10),
-                          ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      titlePadding:
+                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      centerTitle: false,
+                      collapseMode: CollapseMode.parallax,
+                      title: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 3,
+                          horizontal: 6,
+                        ),
+                        child: Text(
+                          "Bhagawad Geeta",
+                          style:
+                              TextStyle(fontFamily: 'Samarkan', fontSize: 22),
                         ),
                       ),
-                    )
+                      background: Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
+                        child: Container(
+                          child: Image.asset(
+                            "assets/images/7.jpg",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                      [
+                        Row(
+                          children: [
+                            Text("Go To Chapter and Verse"),
+                          ],
+                        ),
+                        Text("Chapters"),
+                        SizedBox(height: 20),
+                        for (int i = 0; i < chapters.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                    context, ChapterViewPage.routeName,
+                                    arguments: {
+                                      "chapterHead": chapters.keys.toList()[i],
+                                      "chapterMeaning":
+                                          chapters[chapters.keys.toList()[i]],
+                                      "chapterNumber": i + 1,
+                                    });
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      chapters.keys.toList()[i],
+                                      style: Themes.homeChapterHead,
+                                    ),
+                                    Text(
+                                      chapters[chapters.keys.toList()[i]],
+                                      style: Themes.homeChapterMeaning,
+                                    ),
+                                    SizedBox(height: 10),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                      ],
+                    ),
+                  )
                 ],
               ),
-            ),
+      ),
     );
   }
 }

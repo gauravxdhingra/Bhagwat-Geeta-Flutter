@@ -1,9 +1,10 @@
-import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
-import 'package:bhagwat_geeta/pages/homepage.dart';
-import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
-import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'pages/chapter_view_page.dart';
+import 'pages/homepage.dart';
+import 'pages/verse_view_Page.dart';
+import 'provider/scraper.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,13 +18,13 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Bhagwat Geeta',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: Color(0xffff5521),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         routes: {
           '/': (context) => HomePage(),
           ChapterViewPage.routeName: (context) => ChapterViewPage(),
-          VerseViewPage.routeName:(context)=> VerseViewPage(),
+          VerseViewPage.routeName: (context) => VerseViewPage(),
         },
       ),
     );
