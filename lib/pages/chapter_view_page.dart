@@ -1,3 +1,4 @@
+import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +42,14 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       final document = await provider.getWebpage(url + "1");
       pages = provider.getTotalPagesChapter(document);
       chapterDetails = provider.getChapterDetails(document);
+      chapterHeading = document
+          .getElementsByClassName("hanuman-gradient-text")[0]
+          .getElementsByTagName("h2")[0]
+          .text;
+      chapterMeaning = document
+          .getElementsByClassName("hanuman-gradient-text")[0]
+          .getElementsByTagName("h3")[0]
+          .text;
       verses = provider.getVersesFromPage(document);
 
       setState(() {
@@ -73,35 +82,26 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: MediaQuery.of(context).size.height / 3.9,
+              expandedHeight: MediaQuery.of(context).size.height / 3,
               pinned: true,
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding:
                     EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 centerTitle: false,
                 collapseMode: CollapseMode.parallax,
-                title: Container(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 3,
-                    horizontal: 6,
-                  ),
-                  child: Text(
-                    "category",
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                  ),
+                title: Text(
+                  chapterHeading,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                 ),
                 background: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).scaffoldBackgroundColor,
                   ),
                   child: Container(
-                    color: Theme.of(context).primaryColor,
+                    child: Image.asset("assets/images/cover1.jpg",
+                        fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -109,25 +109,48 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
             SliverList(
               delegate: SliverChildListDelegate(
                 [
-                  Text(chapterNumber.toString() + " " + chapterHeading),
                   Text(chapterMeaning),
-                  Text(chapterDetails),
+                  Container(
+                    width: double.infinity,
+                    child: Text(
+                      chapterDetails,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                   if (_isLoading) CircularProgressIndicator(),
                   if (!_isLoading)
                     for (int i = 0; i < verses.length; i++)
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, VerseViewPage.routeName,
-                              arguments: {
-                                "verseUrl": verses[i]["url"],
-                              });
-                        },
-                        child: Container(
-                          child: Column(
-                            children: [
-                              Text(verses[i]["verseNo"]),
-                              Text(verses[i]["verse"]),
-                            ],
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, VerseViewPage.routeName,
+                                arguments: {
+                                  "verseUrl": verses[i]["url"],
+                                });
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 150,
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  verses[i]["verseNo"],
+                                  style: Themes.homeChapterHead,
+                                ),
+                                Text(
+                                  verses[i]["verse"],
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

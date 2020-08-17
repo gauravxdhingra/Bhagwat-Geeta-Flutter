@@ -74,16 +74,9 @@ class _HomePageState extends State<HomePage> {
                           EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                       centerTitle: false,
                       collapseMode: CollapseMode.parallax,
-                      title: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 3,
-                          horizontal: 6,
-                        ),
-                        child: Text(
-                          "Bhagawad Geeta",
-                          style:
-                              TextStyle(fontFamily: 'Samarkan', fontSize: 22),
-                        ),
+                      title: Text(
+                        "Bhagawad Geeta",
+                        style: TextStyle(fontFamily: 'Samarkan', fontSize: 22),
                       ),
                       background: Container(
                         decoration: BoxDecoration(
@@ -124,19 +117,41 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: Container(
                                 width: double.infinity,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
+                                height: 170,
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Stack(
                                   children: [
-                                    Text(
-                                      chapters.keys.toList()[i],
-                                      style: Themes.homeChapterHead,
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Icon(
+                                        Icons.navigate_next,
+                                        color: Colors.white,
+                                        size: 35,
+                                      ),
                                     ),
-                                    Text(
-                                      chapters[chapters.keys.toList()[i]],
-                                      style: Themes.homeChapterMeaning,
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${i + 1}. ' +
+                                              chapters.keys.toList()[i],
+                                          style: Themes.homeChapterHead,
+                                        ),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          chapters[chapters.keys.toList()[i]],
+                                          style: Themes.homeChapterMeaning,
+                                        ),
+                                        SizedBox(height: 10),
+                                      ],
                                     ),
-                                    SizedBox(height: 10),
                                   ],
                                 ),
                               ),
