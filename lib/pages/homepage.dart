@@ -1,3 +1,4 @@
+import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,15 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: 20),
                   for (int i = 0; i < chapters.length; i++)
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, ChapterViewPage.routeName,
+                            arguments: {
+                              "chapterHead": chapters.keys.toList()[i],
+                              "chapterMeaning":
+                                  chapters[chapters.keys.toList()[i]],
+                              "chapterNumber": i + 1,
+                            });
+                      },
                       child: Container(
                         width: double.infinity,
                         child: Column(

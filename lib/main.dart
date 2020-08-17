@@ -1,4 +1,6 @@
+import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/pages/homepage.dart';
+import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,8 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           '/': (context) => HomePage(),
+          ChapterViewPage.routeName: (context) => ChapterViewPage(),
+          VerseViewPage.routeName:(context)=> VerseViewPage(),
         },
       ),
     );
