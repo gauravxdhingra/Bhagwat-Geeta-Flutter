@@ -84,16 +84,18 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
             SliverAppBar(
               expandedHeight: MediaQuery.of(context).size.height / 3,
               pinned: true,
+              centerTitle: true,
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding:
                     EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 centerTitle: false,
                 collapseMode: CollapseMode.parallax,
                 title: Text(
-                  chapterHeading,
+                  _isLoading ? "" : chapterHeading,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Samarkan'),
                 ),
                 background: Container(
                   decoration: BoxDecoration(
@@ -109,14 +111,25 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
             SliverList(
               delegate: SliverChildListDelegate(
                 [
-                  Text(chapterMeaning),
-                  Container(
-                    width: double.infinity,
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 15, right: 15, top: 25, bottom: 15),
                     child: Text(
-                      chapterDetails,
-                      textAlign: TextAlign.center,
+                      _isLoading ? "" : chapterMeaning,
+                      style:
+                          TextStyle(fontSize: 20, color: Themes.primaryColor),
                     ),
                   ),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(15),
+                    child: Text(
+                      _isLoading ? "" : chapterDetails,
+                      textAlign: TextAlign.justify,
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  SizedBox(height: 10),
                   if (_isLoading) CircularProgressIndicator(),
                   if (!_isLoading)
                     for (int i = 0; i < verses.length; i++)
@@ -132,22 +145,35 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                           },
                           child: Container(
                             width: double.infinity,
-                            height: 150,
+                            height: 170,
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Theme.of(context).primaryColor,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Stack(
                               children: [
-                                Text(
-                                  verses[i]["verseNo"],
-                                  style: Themes.homeChapterHead,
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Icon(
+                                    Icons.navigate_next,
+                                    color: Colors.white,
+                                    size: 35,
+                                  ),
                                 ),
-                                Text(
-                                  verses[i]["verse"],
-                                  style: TextStyle(color: Colors.white),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      verses[i]["verseNo"],
+                                      style: Themes.homeChapterHead,
+                                    ),
+                                    Text(
+                                      verses[i]["verse"],
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -168,6 +194,15 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
             ),
           ],
         ),
+        // floatingActionButton: chapterNumber < 18
+        //     ? FloatingActionButton.extended(
+        //         label: Text("Next Chapter"),
+        //         onPressed: () {},
+        //         backgroundColor: Colors.red[700],
+        //         icon: Icon(Icons.navigate_next),
+        //         // Themes.primaryColor,
+        //       )
+        // : null,
       ),
     );
   }

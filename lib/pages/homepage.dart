@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 width: double.infinity,
                                 height: 170,
-                                padding: EdgeInsets.all(10),
+                                padding: EdgeInsets.all(15),
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).primaryColor,
                                   borderRadius: BorderRadius.circular(10),
@@ -147,7 +147,10 @@ class _HomePageState extends State<HomePage> {
                                         SizedBox(height: 10),
                                         Text(
                                           chapters[chapters.keys.toList()[i]],
-                                          style: Themes.homeChapterMeaning,
+                                          style: Themes.homeChapterMeaning
+                                              .copyWith(
+                                                  color: Colors.white
+                                                      .withOpacity(0.75)),
                                         ),
                                         SizedBox(height: 10),
                                       ],
