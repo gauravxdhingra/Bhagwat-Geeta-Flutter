@@ -59,7 +59,7 @@ class Scraper with ChangeNotifier {
   }
 
   Map<String, String> getFullVerse(dom.Document document) {
-    Map verse = {};
+    Map<String, String> verse = {};
     String title = "";
     String verseSanskrit = "";
     String transliteration = "";
@@ -78,11 +78,11 @@ class Scraper with ChangeNotifier {
     // अनुवाद   translation
 
     verse = {
-      title: title,
-      verseSanskrit: verseSanskrit,
-      transliteration: transliteration,
-      wordMeanings: wordMeanings,
-      translation: translation,
+      "title": title,
+      "verseSanskrit": verseSanskrit,
+      "transliteration": transliteration,
+      "wordMeanings": wordMeanings,
+      "translation": translation,
     };
     return verse;
   }

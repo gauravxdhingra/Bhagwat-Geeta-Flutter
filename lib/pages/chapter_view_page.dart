@@ -1,3 +1,4 @@
+import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:flutter/material.dart';
 
@@ -50,8 +51,8 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   }
 
   getNextPage(int i, provider) async {
-    String url = "https://bhagavadgita.io/chapter/1/?page=";
-    final document = await provider.getWebpage(url + '$i');
+    String url = "https://bhagavadgita.io/chapter/1/?page=$i";
+    final document = await provider.getWebpage(url);
     verses = provider.getVersesFromPage(document);
   }
 
@@ -62,14 +63,18 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Text("Chapter Number + Chapter Name"),
-            Text("Chapter Desc"),
+            Text(chapterNumber.toString() + " " + chapterHeading),
+            Text(chapterMeaning),
+            Text(chapterDetails),
             if (_isLoading) CircularProgressIndicator(),
             if (!_isLoading)
               for (int i = 0; i < verses.length; i++)
                 InkWell(
                   onTap: () {
-                    // verses[i]["url"]
+                    Navigator.pushNamed(context, VerseViewPage.routeName,
+                        arguments: {
+                          "verseUrl": verses[i]["url"],
+                        });
                   },
                   child: Container(
                     child: Column(
@@ -80,6 +85,10 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                     ),
                   ),
                 ),
+            FlatButton(
+              child: Text("Load More"),
+              onPressed: () {},
+            ),
           ],
         ),
       ),
