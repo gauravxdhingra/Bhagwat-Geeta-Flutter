@@ -16,12 +16,14 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   bool init = false;
 
   int chapterNumber = 1;
-
   int pages = 1;
+  int currentPage = 1;
 
   String chapterHeading = "";
   String chapterMeaning = "";
   String chapterDetails = "";
+
+  Scraper provider;
 
   List<Map<String, String>> verses = [];
 
@@ -33,7 +35,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       chapterMeaning = args["chapterMeaning"];
       chapterNumber = args["chapterNumber"];
 
-      final provider = Provider.of<Scraper>(context);
+      provider = Provider.of<Scraper>(context);
 
       String url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
       final document = await provider.getWebpage(url + "1");
@@ -46,14 +48,22 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         init = true;
       });
     }
-
     super.didChangeDependencies();
   }
 
-  getNextPage(int i, provider) async {
-    String url = "https://bhagavadgita.io/chapter/1/?page=$i";
+  bool isGettingMore = false;
+
+  getNextPage(int chapter, int page, provider) async {
+    setState(() {
+      isGettingMore = true;
+    });
+    String url = "https://bhagavadgita.io/chapter/$chapter/?page=$page";
     final document = await provider.getWebpage(url);
-    verses = provider.getVersesFromPage(document);
+
+    verses.addAll(provider.getVersesFromPage(document));
+    setState(() {
+      isGettingMore = false;
+    });
   }
 
   @override
@@ -85,10 +95,14 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                     ),
                   ),
                 ),
-            FlatButton(
-              child: Text("Load More"),
-              onPressed: () {},
-            ),
+            if (currentPage < pages)
+              FlatButton(
+                child: Text("Load More"),
+                onPressed: () async {
+                  await getNextPage(chapterNumber, currentPage + 1, provider);
+                  currentPage += 1;
+                },
+              ),
           ],
         ),
       ),
