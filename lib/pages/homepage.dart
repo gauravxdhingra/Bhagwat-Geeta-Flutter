@@ -1,4 +1,5 @@
 import 'package:bhagwat_geeta/provider/scraper.dart';
+import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
@@ -21,16 +22,15 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() async {
     if (!init) {
-      String url =
-          // "https://bhagavadgita.io";
-          "https://bhagavadgita.io/chapter/1/?page=1";
+      String url = "https://bhagavadgita.io";
+      // "https://bhagavadgita.io/chapter/1/?page=1";
 
       final provider = Provider.of<Scraper>(context);
       final document = await provider.getWebpage(url);
       chapters = await provider.getChapters(document);
-      print(provider.getChapterDetails(document));
-      print(provider.getTotalPagesChapter(document).toString());
-      print(provider.getVersesFromPage(document));
+      // print(provider.getChapterDetails(document));
+      // print(provider.getTotalPagesChapter(document).toString());
+      // print(provider.getVersesFromPage(document));
       print(chapters);
     }
 
@@ -44,10 +44,45 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          // TODO Go To Chapter and Verse
-          // TODO Language
-          ),
+      appBar: AppBar(),
+      body: _isLoading
+          ? CircularProgressIndicator()
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text("Go To Chapter and Verse"),
+                    ],
+                  ),
+                  Text("Chapters"),
+                  SizedBox(height: 20),
+                  for (int i = 0; i < chapters.length; i++)
+                    InkWell(
+                      onTap: () {},
+                      child: Container(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              chapters.keys.toList()[i],
+                              style: Themes.homeChapterHead,
+                            ),
+                            Text(
+                              chapters[chapters.keys.toList()[i]],
+                              style: Themes.homeChapterMeaning,
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
     );
   }
 }

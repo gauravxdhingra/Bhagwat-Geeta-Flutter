@@ -16,7 +16,7 @@ class Scraper with ChangeNotifier {
     document
         .getElementsByClassName("card-header-title chapter-name")
         .forEach((element) {
-      chapterNames.add(element.text);
+      chapterNames.add(element.text.split(".")[1].trim());
     });
     print(chapterNames);
 
@@ -86,6 +86,4 @@ class Scraper with ChangeNotifier {
     };
     return verse;
   }
-
-  
 }
