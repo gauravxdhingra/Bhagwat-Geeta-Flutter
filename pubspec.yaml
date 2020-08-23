@@ -30,6 +30,7 @@ dependencies:
   provider: ^4.3.2
   html: ^0.14.0+3
   http: ^0.12.2
+  youtube_explode_dart: ^1.4.3
 
 dev_dependencies:
   flutter_test:
