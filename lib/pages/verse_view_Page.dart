@@ -161,7 +161,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
           SizedBox(height: 30),
           buildTitle("Translation"), SizedBox(height: 10),
           Text(verse["translation"],
-              style: TextStyle(fontSize: 20), textAlign: TextAlign.center),
+              style: TextStyle(fontSize: 17), textAlign: TextAlign.center),
 
           SizedBox(height: 50),
           buildTitle("Word Meanings"), SizedBox(height: 15),
@@ -172,7 +172,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
                     verse["wordMeanings"].split("; ")[i].replaceAll("—", " — "),
                     style: TextStyle(fontSize: 17, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.center),
-                SizedBox(height: 9),
+                SizedBox(height: 7),
               ],
             ),
           SizedBox(height: 30),

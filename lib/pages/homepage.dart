@@ -1,4 +1,5 @@
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
+import 'package:bhagwat_geeta/pages/search_screen.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +62,9 @@ class _HomePageState extends State<HomePage> {
                     actions: [
                       IconButton(
                         icon: Icon(Icons.search),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, SearchScreen.routeName);
+                        },
                       ),
                     ],
                     flexibleSpace: FlexibleSpaceBar(
@@ -123,7 +126,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 8),
           for (int i = 0; i < chapters.length; i++)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               child: InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, ChapterViewPage.routeName,

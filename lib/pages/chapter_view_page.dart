@@ -1,11 +1,15 @@
 import 'dart:math';
+import 'dart:typed_data';
 
-import 'package:bhagwat_geeta/theme/theme.dart';
+import 'package:blurhash/blurhash.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yte;
 
 import '../provider/scraper.dart';
+import '../theme/theme.dart';
 import 'verse_view_Page.dart';
 
 class ChapterViewPage extends StatefulWidget {
@@ -32,7 +36,10 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   ScrollController _controller = ScrollController();
 
   List<Map<String, String>> verses = [];
-  String imageUrl = "";
+  String imageUrl =
+      "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-101.jpg";
+  String blurhashString = "LUK1Q^01WCWF_MD%t3WE4;%KV[of";
+  Uint8List imageDataBytes;
 
   @override
   void didChangeDependencies() async {
@@ -65,6 +72,12 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
       print(imageUrl);
 
+      var x = await Hive.openBox<Map>("Geeta").then((value) => value.toMap());
+      blurhashString = x["blurhash"]["$number"];
+      print(blurhashString);
+
+      imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
+
       _controller.addListener(() {
         if (_controller.position.pixels ==
             _controller.position.maxScrollExtent) {
@@ -73,6 +86,15 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         }
       });
 
+// TODO GET AUDIO STREAM
+      // var yt = yte.YoutubeExplode();
+      // var manifest = await yt.videos.streamsClient.getManifest('16yApGx6NEs');
+      // print(manifest.audioOnly.last.url);
+      // yt.close();
+
+      // var video =
+      //     await yt.videos.get('https://www.youtube.com/watch?v=16yApGx6NEs');
+      // print('Title: ${video.title}');
       setState(() {
         _isLoading = false;
         init = true;
@@ -111,35 +133,38 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                     delegate: SliverChildListDelegate(
                       [
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 15, right: 15, top: 25, bottom: 15),
-                          child: Text(_isLoading ? "" : chapterMeaning,
-                              style: TextStyle(
-                                  fontSize: 20, color: Themes.primaryColor)),
-                        ),
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, top: 30, bottom: 0),
+                            child: Text(_isLoading ? "" : chapterMeaning,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    color: Themes.primaryColor,
+                                    fontFamily: 'Samarkan'))),
                         Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(15),
-                          child: Text(_isLoading ? "" : chapterDetails,
-                              textAlign: TextAlign.justify,
-                              style: TextStyle(fontSize: 15)),
-                        ),
-                        SizedBox(height: 10),
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: Text(_isLoading ? "" : chapterDetails,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(fontSize: 15))),
+                        SizedBox(height: 30),
                         if (_isLoading) CircularProgressIndicator(),
+                        if (!_isLoading)
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 15, right: 15, top: 0, bottom: 10),
+                              child: Text(_isLoading ? "" : "Verses",
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      color: Themes.primaryColor,
+                                      fontFamily: 'Samarkan'))),
                         if (!_isLoading)
                           for (int i = 0; i < verses.length; i++)
                             buildVerseButtons(context, i),
                         SizedBox(height: 20),
                         if (currentPage < pages) CircularProgressIndicator(),
                         if (currentPage < pages) SizedBox(height: 20),
-                        // FlatButton(
-                        //   child: Text("Load More"),
-                        //   onPressed: () async {
-                        //     await getNextPage(
-                        //         chapterNumber, currentPage + 1, provider);
-                        //     currentPage += 1;
-                        //   },
-                        // ),
                       ],
                     ),
                   ),
@@ -160,7 +185,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
   Padding buildVerseButtons(BuildContext context, int i) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: InkWell(
         onTap: () {
           Navigator.pushNamed(context, VerseViewPage.routeName, arguments: {
@@ -177,16 +202,18 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
           child: Stack(
             children: [
               Positioned(
-                bottom: 0,
-                right: 0,
-                child: Icon(Icons.navigate_next, color: Colors.white, size: 35),
-              ),
+                  bottom: 0,
+                  right: 0,
+                  child:
+                      Icon(Icons.navigate_next, color: Colors.white, size: 35)),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(verses[i]["verseNo"], style: Themes.homeChapterHead),
-                  Text(verses[i]["verse"],
-                      style: TextStyle(color: Colors.white)),
+                  Text(
+                    verses[i]["verse"],
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ],
               ),
             ],
@@ -207,22 +234,27 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         centerTitle: false,
         collapseMode: CollapseMode.parallax,
         title: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-          decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(4)),
-          child: Text(_isLoading ? "" : chapterHeading,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: 'Samarkan')),
-        ),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(4)),
+            child: Text(_isLoading ? "" : chapterHeading,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: 'Samarkan'))),
         background: Container(
-          decoration:
-              BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
-          child: Container(
-              child: CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)),
-        ),
+            decoration:
+                BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
+            child: Container(
+                child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (BuildContext context, String url) => Image.memory(
+                  imageDataBytes,
+                  fit: BoxFit.cover,
+                  width: double.infinity),
+            ))),
       ),
     );
   }
