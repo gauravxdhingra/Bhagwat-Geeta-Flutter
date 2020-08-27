@@ -1,10 +1,7 @@
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
-import 'package:flutter/material.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' as parser;
-import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart'; 
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
