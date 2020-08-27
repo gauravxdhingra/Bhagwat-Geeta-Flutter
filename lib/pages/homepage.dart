@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
         body: _isLoading
             ? CircularProgressIndicator()
             : CustomScrollView(
+                physics: BouncingScrollPhysics(),
                 slivers: [
                   SliverAppBar(
                     expandedHeight: MediaQuery.of(context).size.height / 3,
@@ -91,80 +92,69 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        Row(
-                          children: [
-                            Text("Go To Chapter and Verse"),
-                          ],
-                        ),
-                        Text("Chapters"),
-                        SizedBox(height: 20),
-                        for (int i = 0; i < chapters.length; i++)
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                    context, ChapterViewPage.routeName,
-                                    arguments: {
-                                      "chapterHead": chapters.keys.toList()[i],
-                                      "chapterMeaning":
-                                          chapters[chapters.keys.toList()[i]],
-                                      "chapterNumber": i + 1,
-                                    });
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                height: 170,
-                                padding: EdgeInsets.all(15),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: Icon(
-                                        Icons.navigate_next,
-                                        color: Colors.white,
-                                        size: 35,
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '${i + 1}. ' +
-                                              chapters.keys.toList()[i],
-                                          style: Themes.homeChapterHead,
-                                        ),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          chapters[chapters.keys.toList()[i]],
-                                          style: Themes.homeChapterMeaning
-                                              .copyWith(
-                                                  color: Colors.white
-                                                      .withOpacity(0.75)),
-                                        ),
-                                        SizedBox(height: 10),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
-                  )
+                  buildBody(context)
                 ],
               ),
+      ),
+    );
+  }
+
+  SliverList buildBody(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        [
+          Row(
+            children: [Text("Go To Chapter and Verse")],
+          ),
+          Text("Chapters"),
+          SizedBox(height: 20),
+          for (int i = 0; i < chapters.length; i++)
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, ChapterViewPage.routeName,
+                      arguments: {
+                        "chapterHead": chapters.keys.toList()[i],
+                        "chapterMeaning": chapters[chapters.keys.toList()[i]],
+                        "chapterNumber": i + 1,
+                      });
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 170,
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Icon(Icons.navigate_next,
+                            color: Colors.white, size: 35),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('${i + 1}. ' + chapters.keys.toList()[i],
+                              style: Themes.homeChapterHead),
+                          SizedBox(height: 10),
+                          Text(chapters[chapters.keys.toList()[i]],
+                              style: Themes.homeChapterMeaning.copyWith(
+                                  color: Colors.white.withOpacity(0.75))),
+                          SizedBox(height: 10),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          SizedBox(height: 30),
+        ],
       ),
     );
   }

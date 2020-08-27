@@ -69,56 +69,95 @@ class _VerseViewPageState extends State<VerseViewPage> {
             : CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [
-                  SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height / 3,
-                    pinned: true,
-                    centerTitle: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      titlePadding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      centerTitle: false,
-                      collapseMode: CollapseMode.parallax,
-                      title: Text(verse["title"],
-                          style: TextStyle(fontFamily: 'Samarkan'),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center),
-                      background: Container(
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor),
-                          child: Container(
-                              child: CachedNetworkImage(imageUrl: imageUrl))),
+                  buildSliverAppBar(context),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.centerLeft,
+                          child: Icon(FlutterIcons.quote_left_faw,
+                              color: Theme.of(context).primaryColor),
+                        ),
+                        SizedBox(height: 20),
+                        Text(verse["verseSanskrit"],
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Samarkan'),
+                            textAlign: TextAlign.center),
+
+                        Container(
+                          width: double.infinity,
+                          alignment: Alignment.centerRight,
+                          child: Icon(FlutterIcons.quote_right_faw,
+                              color: Theme.of(context).primaryColor),
+                        ),
+                        // TODO IF ENGLISH
+
+                        SizedBox(height: 20),
+                        Text('Transliteration'),
+                        Text(verse["transliteration"],
+                            style: TextStyle(fontSize: 17),
+                            textAlign: TextAlign.center),
+
+                        SizedBox(height: 20),
+                        Text("Word Meanings"),
+                        for (int i = 0;
+                            i < verse["wordMeanings"].split("; ").length;
+                            i++)
+                          Column(
+                            children: [
+                              Text(verse["wordMeanings"].split("; ")[i],
+                                  style: TextStyle(fontSize: 17),
+                                  textAlign: TextAlign.center),
+                              SizedBox(height: 9),
+                            ],
+                          ),
+// —
+
+                        SizedBox(height: 20),
+                        Text("Translation"),
+                        Text(verse["translation"],
+                            style: TextStyle(fontSize: 20),
+                            textAlign: TextAlign.center),
+                        SizedBox(height: 100),
+                      ]),
                     ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildListDelegate([
-                      Icon(FlutterIcons.quote_right_faw),
-                      Text(verse["verseSanskrit"],
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Samarkan'),
-                          textAlign: TextAlign.center),
-                      // TODO IF ENGLISH
-
-                      Text('Transliteration'),
-                      Text(verse["transliteration"],
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center),
-
-                      Text("Word Meanings"),
-                      Text(verse["wordMeanings"],
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center),
-
-                      Text("Translation"),
-                      Text(verse["translation"],
-                          style: TextStyle(fontSize: 20),
-                          textAlign: TextAlign.center),
-                    ]),
                   )
                 ],
               ),
+      ),
+    );
+  }
+
+  SliverAppBar buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: MediaQuery.of(context).size.height / 3,
+      pinned: true,
+      centerTitle: true,
+      flexibleSpace: FlexibleSpaceBar(
+        titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        centerTitle: false,
+        collapseMode: CollapseMode.parallax,
+        title: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(4)),
+            child: Text(verse["title"],
+                style: TextStyle(fontFamily: 'Samarkan'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center)),
+        background: Container(
+            decoration:
+                BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
+            child: Container(
+                child:
+                    CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover))),
       ),
     );
   }
