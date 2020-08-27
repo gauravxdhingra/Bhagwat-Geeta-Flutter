@@ -17,14 +17,14 @@ void main() async {
   Hive.init(document.path);
 
   var prefs = await SharedPreferences.getInstance();
-  prefs.clear();
+  // prefs.clear();
   bool init = prefs.getBool("init") ?? false;
 
   if (!init)
     SharedPreferences.getInstance()
         .then((value) => value.setBool("init", true))
         .then((value) async {
-      var x = await Hive.openBox<Map>("Blurhash");
+      var x = await Hive.openBox<Map>("Geeta");
 
       Map blurhash = {
         "100": "LeI}LV~nE3IB?a%MRkoHNaafRkkC",

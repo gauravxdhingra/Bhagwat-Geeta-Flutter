@@ -1,7 +1,7 @@
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,10 +26,6 @@ class _HomePageState extends State<HomePage> {
       final provider = Provider.of<Scraper>(context);
       final document = await provider.getWebpage(url);
       chapters = await provider.getChapters(document);
-      // print(provider.getChapterDetails(document));
-      // print(provider.getTotalPagesChapter(document).toString());
-      // print(provider.getVersesFromPage(document));
-      print(chapters);
     }
 
     setState(() {
@@ -61,6 +57,7 @@ class _HomePageState extends State<HomePage> {
                   SliverAppBar(
                     expandedHeight: MediaQuery.of(context).size.height / 3,
                     pinned: true,
+                    stretch: true,
                     actions: [
                       IconButton(
                         icon: Icon(Icons.search),

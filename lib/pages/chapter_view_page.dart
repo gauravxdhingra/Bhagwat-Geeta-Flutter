@@ -29,6 +29,8 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
   Scraper provider;
 
+  ScrollController _controller = ScrollController();
+
   List<Map<String, String>> verses = [];
   String imageUrl = "";
 
@@ -63,6 +65,14 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
       print(imageUrl);
 
+      _controller.addListener(() {
+        if (_controller.position.pixels ==
+            _controller.position.maxScrollExtent) {
+          getNextPage(chapterNumber, currentPage + 1, provider);
+          currentPage += 1;
+        }
+      });
+
       setState(() {
         _isLoading = false;
         init = true;
@@ -93,128 +103,43 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         body: _isLoading
             ? CircularProgressIndicator()
             : CustomScrollView(
+                controller: _controller,
                 physics: BouncingScrollPhysics(),
                 slivers: [
-                  SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height / 3,
-                    pinned: true,
-                    centerTitle: true,
-                    flexibleSpace: FlexibleSpaceBar(
-                      titlePadding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      centerTitle: false,
-                      collapseMode: CollapseMode.parallax,
-                      title: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                        decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(4)),
-                        child: Text(
-                          _isLoading ? "" : chapterHeading,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontFamily: 'Samarkan'),
-                        ),
-                      ),
-                      background: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
-                        child: Container(
-                            child: CachedNetworkImage(
-                                imageUrl: imageUrl, fit: BoxFit.cover)
-                            //  Image.asset("assets/images/cover1.jpg",
-                            //     fit: BoxFit.cover),
-                            ),
-                      ),
-                    ),
-                  ),
+                  buildSliverAppBar(context),
                   SliverList(
                     delegate: SliverChildListDelegate(
                       [
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 15, right: 15, top: 25, bottom: 15),
-                          child: Text(
-                            _isLoading ? "" : chapterMeaning,
-                            style: TextStyle(
-                                fontSize: 20, color: Themes.primaryColor),
-                          ),
+                          child: Text(_isLoading ? "" : chapterMeaning,
+                              style: TextStyle(
+                                  fontSize: 20, color: Themes.primaryColor)),
                         ),
                         Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(15),
-                          child: Text(
-                            _isLoading ? "" : chapterDetails,
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(fontSize: 15),
-                          ),
+                          child: Text(_isLoading ? "" : chapterDetails,
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(fontSize: 15)),
                         ),
                         SizedBox(height: 10),
                         if (_isLoading) CircularProgressIndicator(),
                         if (!_isLoading)
                           for (int i = 0; i < verses.length; i++)
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, VerseViewPage.routeName,
-                                      arguments: {
-                                        "verseUrl": verses[i]["url"],
-                                      });
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 170,
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).primaryColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Icon(
-                                          Icons.navigate_next,
-                                          color: Colors.white,
-                                          size: 35,
-                                        ),
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            verses[i]["verseNo"],
-                                            style: Themes.homeChapterHead,
-                                          ),
-                                          Text(
-                                            verses[i]["verse"],
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        if (currentPage < pages)
-                          FlatButton(
-                            child: Text("Load More"),
-                            onPressed: () async {
-                              await getNextPage(
-                                  chapterNumber, currentPage + 1, provider);
-                              currentPage += 1;
-                            },
-                          ),
+                            buildVerseButtons(context, i),
+                        SizedBox(height: 20),
+                        if (currentPage < pages) CircularProgressIndicator(),
+                        if (currentPage < pages) SizedBox(height: 20),
+                        // FlatButton(
+                        //   child: Text("Load More"),
+                        //   onPressed: () async {
+                        //     await getNextPage(
+                        //         chapterNumber, currentPage + 1, provider);
+                        //     currentPage += 1;
+                        //   },
+                        // ),
                       ],
                     ),
                   ),
@@ -229,6 +154,75 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         //         // Themes.primaryColor,
         //       )
         // : null,
+      ),
+    );
+  }
+
+  Padding buildVerseButtons(BuildContext context, int i) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.pushNamed(context, VerseViewPage.routeName, arguments: {
+            "verseUrl": verses[i]["url"],
+          });
+        },
+        child: Container(
+          width: double.infinity,
+          height: 170,
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(10)),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Icon(Icons.navigate_next, color: Colors.white, size: 35),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(verses[i]["verseNo"], style: Themes.homeChapterHead),
+                  Text(verses[i]["verse"],
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  SliverAppBar buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: MediaQuery.of(context).size.height / 3,
+      pinned: true,
+      centerTitle: true,
+      stretch: true,
+      flexibleSpace: FlexibleSpaceBar(
+        titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        centerTitle: false,
+        collapseMode: CollapseMode.parallax,
+        title: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+          decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(4)),
+          child: Text(_isLoading ? "" : chapterHeading,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: 'Samarkan')),
+        ),
+        background: Container(
+          decoration:
+              BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
+          child: Container(
+              child: CachedNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)),
+        ),
       ),
     );
   }
