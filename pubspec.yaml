@@ -31,6 +31,8 @@ dependencies:
   html: ^0.14.0+3
   http: ^0.12.2
   youtube_explode_dart: ^1.4.3
+  cached_network_image: ^2.3.1
+  flutter_icons: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +54,7 @@ flutter:
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
-  # To add custom fonts to your application, add a fonts section here,
+  # To add custom fonts to your applicaticacon, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
