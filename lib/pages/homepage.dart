@@ -104,13 +104,32 @@ class _HomePageState extends State<HomePage> {
       delegate: SliverChildListDelegate(
         [
           Row(
-            children: [Text("Go To Chapter and Verse")],
+            children: [
+              InkWell(
+                  onTap: () {
+                    showModalBottomSheet(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15))),
+                        context: context,
+                        builder: (context) => Container());
+                  },
+                  child: Text("Go To Chapter and Verse"))
+            ],
           ),
-          Text("Chapters"),
           SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text("Chapters",
+                style: Themes.homeChapterHead
+                    .copyWith(color: Theme.of(context).primaryColor),
+                textAlign: TextAlign.center),
+          ),
+          SizedBox(height: 8),
           for (int i = 0; i < chapters.length; i++)
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, ChapterViewPage.routeName,

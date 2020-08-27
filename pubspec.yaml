@@ -33,6 +33,10 @@ dependencies:
   youtube_explode_dart: ^1.4.3
   cached_network_image: ^2.3.1
   flutter_icons: ^1.1.0
+  blurhash: ^0.2.0
+  image: ^2.1.14
+  blurhash_flutter: ^0.1.0
+  blurhash_dart: ^0.2.3
 
 dev_dependencies:
   flutter_test:
@@ -49,6 +53,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/images/GeetaImages/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

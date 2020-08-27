@@ -1,8 +1,16 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bhagwat_geeta/provider/scraper.dart';
+import 'package:blurhash/blurhash.dart';
+import 'package:blurhash_dart/blurhash_dart.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:image/image.dart';
 import 'package:provider/provider.dart';
+import 'package:image/image.dart' as img;
 // import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'dart:math';
 
@@ -28,16 +36,18 @@ class _VerseViewPageState extends State<VerseViewPage> {
       final provider = Provider.of<Scraper>(context);
 
       String url = "https://bhagavadgita.io" + verseUrl;
-      print(url);
+      // print(url);
       final document = await provider.getWebpage(url);
       verse = provider.getFullVerse(document);
 
       final _random = new Random();
       int next(int min, int max) => min + _random.nextInt(max - min);
       int number = next.call(100, 140);
+      if (number == 115 || number == 133) number = 101;
       imageUrl =
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
-      print(imageUrl);
+      // print(imageUrl);
+
       // var yt = YoutubeExplode();
       // var video =
       //     await yt.videos.get('https://www.youtube.com/watch?v=bo_efYhYU2A');
@@ -52,6 +62,35 @@ class _VerseViewPageState extends State<VerseViewPage> {
       // print(streamInfo);
 
       // yt.close();
+
+      Future<String> blurHashEncode(i) async {
+        Uint8List fileData =
+            await (rootBundle.load("assets/images/GeetaImages/$i.jpg"))
+                .then((value) => value.buffer.asUint8List());
+        img.Image image = img.decodeImage(fileData.toList());
+
+        final blurHash = encodeBlurHash(
+          image.getBytes(format: Format.rgba),
+          image.width,
+          image.height,
+        );
+
+        print("$blurHash");
+        return blurHash;
+      }
+
+      for (int i = 100; i <= 114; i++) {
+        print('$i\n');
+        await blurHashEncode(i);
+      }
+      for (int i = 116; i <= 132; i++) {
+        print('$i\n');
+        await blurHashEncode(i);
+      }
+      for (int i = 134; i <= 140; i++) {
+        print('$i\n');
+        await blurHashEncode(i);
+      }
     }
     setState(() {
       _isLoading = false;
@@ -81,7 +120,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
                           child: Icon(FlutterIcons.quote_left_faw,
                               color: Theme.of(context).primaryColor),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 25),
                         Text(verse["verseSanskrit"],
                             style: TextStyle(
                                 fontSize: 20,
@@ -99,30 +138,39 @@ class _VerseViewPageState extends State<VerseViewPage> {
 
                         SizedBox(height: 20),
                         Text('Transliteration'),
-                        Text(verse["transliteration"],
-                            style: TextStyle(fontSize: 17),
+                        Text(
+                          verse["transliteration"],
+                          style: TextStyle(
+                              fontSize: 17, fontStyle: FontStyle.italic),
+                          textAlign: TextAlign.center,
+                        ),
+
+// —
+                        SizedBox(height: 20),
+                        Text("Translation"),
+                        Text(verse["translation"],
+                            style: TextStyle(fontSize: 20),
                             textAlign: TextAlign.center),
 
-                        SizedBox(height: 20),
+                        SizedBox(height: 40),
                         Text("Word Meanings"),
                         for (int i = 0;
                             i < verse["wordMeanings"].split("; ").length;
                             i++)
                           Column(
                             children: [
-                              Text(verse["wordMeanings"].split("; ")[i],
-                                  style: TextStyle(fontSize: 17),
+                              Text(
+                                  verse["wordMeanings"]
+                                      .split("; ")[i]
+                                      .replaceAll("—", " — "),
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontStyle: FontStyle.italic),
                                   textAlign: TextAlign.center),
                               SizedBox(height: 9),
                             ],
                           ),
-// —
 
-                        SizedBox(height: 20),
-                        Text("Translation"),
-                        Text(verse["translation"],
-                            style: TextStyle(fontSize: 20),
-                            textAlign: TextAlign.center),
                         SizedBox(height: 100),
                       ]),
                     ),
@@ -138,12 +186,18 @@ class _VerseViewPageState extends State<VerseViewPage> {
       expandedHeight: MediaQuery.of(context).size.height / 3,
       pinned: true,
       centerTitle: true,
+      actions: [
+        // IconButton(
+        //   icon: Icon(FlutterIcons.share_2_fea),
+        //   onPressed: () {},
+        // )
+      ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         centerTitle: false,
         collapseMode: CollapseMode.parallax,
         title: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(4)),
