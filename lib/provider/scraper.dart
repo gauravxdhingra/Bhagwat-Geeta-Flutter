@@ -86,4 +86,21 @@ class Scraper with ChangeNotifier {
     };
     return verse;
   }
+
+  Map searchResults = {};
+
+  Future<Map> getSearchResults(String query) async {
+    dom.Document searchPage =
+        await getWebpage("https://bhagavadgita.io/search?query=$query");
+    var cards = searchPage.getElementsByClassName("card-body");
+    searchResults = {};
+    cards.forEach((element) {
+      searchResults[element.getElementsByTagName("h4")[0].text] = {
+        "verse": element.getElementsByTagName("p")[0].text,
+        "link": element.getElementsByTagName("a")[0].attributes["href"],
+      };
+    });
+    print(searchResults);
+    return searchResults;
+  }
 }

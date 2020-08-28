@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bhagwat_geeta/pages/app_pageview.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -86,7 +87,8 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         routes: {
-          '/': (context) => HomePage(),
+          '/': (context) => AppPageview(),
+          // HomePage(),
           ChapterViewPage.routeName: (context) => ChapterViewPage(),
           VerseViewPage.routeName: (context) => VerseViewPage(),
           SearchScreen.routeName: (context) => SearchScreen(),
