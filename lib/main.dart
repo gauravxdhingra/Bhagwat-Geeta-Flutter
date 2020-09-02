@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:animations/animations.dart';
 import 'package:bhagwat_geeta/pages/app_pageview.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +15,7 @@ import 'pages/homepage.dart';
 import 'pages/verse_view_Page.dart';
 import 'provider/scraper.dart';
 
+const primaryColor = Color(0xffff5521);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory document = await getApplicationDocumentsDirectory();
@@ -72,6 +75,9 @@ void main() async {
       x.put("blurhash", blurhash);
       // print(x.toMap());
     });
+  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //   statusBarColor: primaryColor,
+  // ));
   runApp(MyApp());
 }
 
@@ -85,6 +91,13 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: Color(0xffff5521),
           visualDensity: VisualDensity.adaptivePlatformDensity,
+        ).copyWith(
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: <TargetPlatform, PageTransitionsBuilder>{
+              TargetPlatform.android: SharedAxisPageTransitionsBuilder(
+                  transitionType: SharedAxisTransitionType.horizontal),
+            },
+          ),
         ),
         routes: {
           '/': (context) => AppPageview(),
@@ -97,5 +110,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-// 2, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 35, 27, 20, 24, 28, 78]
+// [47, 72, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 35, 27, 20, 24, 28, 78]
 // https://bhagavadgita.io/chapter/18/verse/1/

@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
+import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -27,13 +31,51 @@ class _HomePageState extends State<HomePage> {
       final provider = Provider.of<Scraper>(context);
       final document = await provider.getWebpage(url);
       chapters = await provider.getChapters(document);
+      // buildChapterSelectionMap();
+      setState(() {
+        _isLoading = false;
+        init = true;
+      });
     }
 
-    setState(() {
-      _isLoading = false;
-      init = true;
-    });
     super.didChangeDependencies();
+  }
+
+  showPicker() {
+    showPickerModal(BuildContext context) {
+      Picker(
+          adapter: PickerDataAdapter<String>(
+              pickerdata: JsonDecoder().convert(PickerData)),
+          changeToFirst: true,
+          hideHeader: false,
+          onConfirm: (Picker picker, List value) {
+            print(picker.adapter.text);
+            print(picker.adapter.text.split("[")[1].split(",")[0].trim());
+            print(picker.adapter.text.split("]")[0].split(",")[1].trim());
+            Navigator.pop(context);
+            Navigator.pushNamed(context, VerseViewPage.routeName, arguments: {
+              "verseUrl":
+                  '/chapter/${picker.adapter.text.split("[")[1].split(",")[0].trim()}/verse/${picker.adapter.text.split("]")[0].split(",")[1].trim()}/'
+            });
+            Navigator.pushNamed(context, VerseViewPage.routeName, arguments: {
+              "verseUrl":
+                  '/chapter/${picker.adapter.text.split("[")[1].split(",")[0].trim()}/verse/${picker.adapter.text.split("[")[0].split(",")[1].trim()}/'
+            });
+          },
+          confirmText: "Go To",
+          footer: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text("Chapter", style: TextStyle()),
+                Text("Verse"),
+              ],
+            ),
+          )).showModal(this.context);
+    }
+
+    showPickerModal(context);
   }
 
   @override
@@ -66,6 +108,12 @@ class _HomePageState extends State<HomePage> {
                     pinned: true,
                     stretch: true,
                     actions: [
+                      IconButton(
+                        icon: Icon(Icons.translate),
+                        onPressed: () {
+                          Navigator.pushNamed(context, SearchScreen.routeName);
+                        },
+                      ),
                       IconButton(
                         icon: Icon(Icons.search),
                         onPressed: () {
@@ -106,20 +154,16 @@ class _HomePageState extends State<HomePage> {
     return SliverList(
       delegate: SliverChildListDelegate(
         [
-          Row(
-            children: [
-              InkWell(
-                  onTap: () {
-                    showModalBottomSheet(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15))),
-                        context: context,
-                        builder: (context) => Container());
-                  },
-                  child: Text("Go To Chapter and Verse"))
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            child: InkWell(
+                onTap: () => showPicker(),
+                child: Container(
+                    color: Theme.of(context).primaryColor,
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Text("Go To Chapter and Verse",
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        textAlign: TextAlign.center))),
           ),
           SizedBox(height: 20),
           Padding(
@@ -152,11 +196,10 @@ class _HomePageState extends State<HomePage> {
                   child: Stack(
                     children: [
                       Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Icon(Icons.navigate_next,
-                            color: Colors.white, size: 35),
-                      ),
+                          bottom: 0,
+                          right: 0,
+                          child: Icon(Icons.navigate_next,
+                              color: Colors.white, size: 35)),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
@@ -181,3 +224,79 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+// [1 47, 2 72, 3 43, 4 42, 5 29, 6 47, 7 30, 8 28, 9 34, 10 42, 11 55, 12 20, 13 35, 27, 20, 24, 28, 78]
+const PickerData = '''
+[
+  {"1": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47"
+    ]
+  },
+  {"2": [
+      "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72"
+    ]
+  },
+  {"3": [
+      "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43"
+    ]
+  },
+  {"4": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42"
+    ]
+  },
+  {"5": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"
+    ]
+  },
+  {"6": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47"
+    ]
+  },
+  {"7": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30"
+    ]
+  },
+  {"8": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"
+    ]
+  },
+  {"9": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34"
+    ]
+  },
+  {"10": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42"
+    ]
+  },
+  {"11": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55"
+    ]
+  },
+  {"12": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"]
+  },
+  {"13": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35"
+    ]
+  },
+  {"14": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27"
+    ]
+  },
+   { "15": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"
+    ]
+  },
+  {"16": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"
+    ]
+  },
+  {"17": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"
+    ]
+  },
+  {"18": [
+    "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78"
+    ]
+  }
+]''';

@@ -46,8 +46,8 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   void didChangeDependencies() async {
     if (!init) {
       final args = ModalRoute.of(context).settings.arguments as Map;
-      chapterHeading = args["chapterHead"];
-      chapterMeaning = args["chapterMeaning"];
+      chapterHeading = args["chapterHead"] ?? "";
+      chapterMeaning = args["chapterMeaning"] ?? "";
       chapterNumber = args["chapterNumber"];
 
       provider = Provider.of<Scraper>(context);
@@ -190,6 +190,56 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         //         // Themes.primaryColor,
         //       )
         // : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: _isLoading
+            ? null
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    (chapterNumber == 1)
+                        ? FloatingActionButton(
+                            heroTag: null,
+                            onPressed: null,
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                            child: Icon(Icons.navigate_before,
+                                color: Colors.transparent))
+                        : FloatingActionButton(
+                            heroTag: null,
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, ChapterViewPage.routeName,
+                                  arguments: {
+                                    "chapterNumber": chapterNumber - 1
+                                  });
+                            },
+                            backgroundColor: Themes.primaryColor,
+                            child: Icon(Icons.navigate_before)),
+                    (chapterNumber == 18)
+                        ? FloatingActionButton(
+                            heroTag: null,
+                            onPressed: null,
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                            child: Icon(Icons.navigate_before,
+                                color: Colors.transparent))
+                        : FloatingActionButton(
+                            heroTag: null,
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, ChapterViewPage.routeName,
+                                  arguments: {
+                                    "chapterNumber": chapterNumber + 1
+                                  });
+                            },
+                            backgroundColor: Themes.primaryColor,
+                            child: Icon(Icons.navigate_next))
+                  ],
+                ),
+              ),
       ),
     );
   }

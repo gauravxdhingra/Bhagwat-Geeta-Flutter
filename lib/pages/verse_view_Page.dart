@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:bhagwat_geeta/provider/scraper.dart';
+import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:blurhash/blurhash.dart';
 import 'package:blurhash_dart/blurhash_dart.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:image/image.dart' as img;
 // import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'dart:math';
+
+import 'homepage.dart';
 
 class VerseViewPage extends StatefulWidget {
   VerseViewPage({Key key}) : super(key: key);
@@ -29,15 +33,23 @@ class _VerseViewPageState extends State<VerseViewPage> {
   String imageUrl =
       "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-101.jpg";
   String blurhashString = "LUK1Q^01WCWF_MD%t3WE4;%KV[of";
-
+  String verseUrl = "";
+  var data;
   Map<String, String> verse = {};
+  int chapterNo;
+  int verseNo;
   @override
   void didChangeDependencies() async {
     if (!init) {
       final args = ModalRoute.of(context).settings.arguments as Map;
-      final verseUrl = args["verseUrl"];
+      verseUrl = args["verseUrl"];
       final provider = Provider.of<Scraper>(context);
-
+      data = JsonDecoder().convert(PickerData);
+      chapterNo = int.parse(verseUrl.split("/chapter/")[1].split("/")[0]);
+      verseNo = int.parse(verseUrl.split("/verse/")[1].split("/")[0]);
+      // print(data[int.parse(verseUrl.split("/chapter/")[1].split("/")[0]) - 1]
+      //         [verseUrl.split("/chapter/")[1].split("/")[0]]
+      //     .length);
       String url = "https://bhagavadgita.io" + verseUrl;
       print(url);
       final document = await provider.getWebpage(url);
@@ -124,6 +136,55 @@ class _VerseViewPageState extends State<VerseViewPage> {
             : CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [buildSliverAppBar(context), buildSliverBody(context)],
+              ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: _isLoading
+            ? null
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    (verseUrl.split("/verse/")[1].split("/")[0] == "1")
+                        ? FloatingActionButton(
+                            heroTag: null,
+                            onPressed: null,
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                            child: Icon(Icons.navigate_before,
+                                color: Colors.transparent))
+                        : FloatingActionButton(
+                            heroTag: null,
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, VerseViewPage.routeName, arguments: {
+                                "verseUrl":
+                                    "/chapter/$chapterNo/verse/${verseNo - 1}/"
+                              });
+                            },
+                            backgroundColor: Themes.primaryColor,
+                            child: Icon(Icons.navigate_before)),
+                    (verseNo == data[chapterNo - 1]['$chapterNo'].length)
+                        ? FloatingActionButton(
+                            heroTag: null,
+                            onPressed: null,
+                            elevation: 0,
+                            backgroundColor: Colors.transparent,
+                            child: Icon(Icons.navigate_before,
+                                color: Colors.transparent))
+                        : FloatingActionButton(
+                            heroTag: null,
+                            onPressed: () {
+                              Navigator.pushReplacementNamed(
+                                  context, VerseViewPage.routeName, arguments: {
+                                "verseUrl":
+                                    "/chapter/$chapterNo/verse/${verseNo + 1}/"
+                              });
+                            },
+                            backgroundColor: Themes.primaryColor,
+                            child: Icon(Icons.navigate_next))
+                  ],
+                ),
               ),
       ),
     );
