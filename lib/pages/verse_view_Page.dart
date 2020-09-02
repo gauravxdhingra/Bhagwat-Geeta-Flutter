@@ -114,7 +114,13 @@ class _VerseViewPageState extends State<VerseViewPage> {
     return SafeArea(
       child: Scaffold(
         body: _isLoading
-            ? CircularProgressIndicator()
+            ? Center(
+                child: Image.asset(
+                  'assets/images/loading.gif',
+                  // height: 125.0,
+                  width: 125.0,
+                ),
+              )
             : CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [buildSliverAppBar(context), buildSliverBody(context)],

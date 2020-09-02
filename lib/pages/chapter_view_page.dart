@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:blurhash/blurhash.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yte;
@@ -123,7 +124,13 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
     return SafeArea(
       child: Scaffold(
         body: _isLoading
-            ? CircularProgressIndicator()
+            ? Center(
+                child: Image.asset(
+                  'assets/images/loading.gif',
+                  height: 125.0,
+                  width: 125.0,
+                ),
+              )
             : CustomScrollView(
                 controller: _controller,
                 physics: BouncingScrollPhysics(),
@@ -153,7 +160,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                         if (!_isLoading)
                           Padding(
                               padding: const EdgeInsets.only(
-                                  left: 15, right: 15, top: 0, bottom: 10),
+                                  left: 15, right: 15, top: 0, bottom: 15),
                               child: Text(_isLoading ? "" : "Verses",
                                   style: TextStyle(
                                       fontSize: 30,
@@ -163,7 +170,11 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                           for (int i = 0; i < verses.length; i++)
                             buildVerseButtons(context, i),
                         SizedBox(height: 20),
-                        if (currentPage < pages) CircularProgressIndicator(),
+                        if (currentPage < pages)
+                          SpinKitThreeBounce(
+                            color: Theme.of(context).primaryColor,
+                            size: 25,
+                          ),
                         if (currentPage < pages) SizedBox(height: 20),
                       ],
                     ),

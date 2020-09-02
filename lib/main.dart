@@ -97,3 +97,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+// 2, 43, 42, 29, 47, 30, 28, 34, 42, 55, 20, 35, 27, 20, 24, 28, 78]
+// https://bhagavadgita.io/chapter/18/verse/1/

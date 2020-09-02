@@ -51,7 +51,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: _isLoading
-            ? CircularProgressIndicator()
+            ? Center(
+                child: Image.asset(
+                  'assets/images/loading.gif',
+                  // height: 125.0,
+                  width: 125.0,
+                ),
+              )
             : CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [

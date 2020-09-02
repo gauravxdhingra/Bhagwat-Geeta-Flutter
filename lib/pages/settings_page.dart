@@ -12,7 +12,11 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text("SETTINGS"),
+        child: Image.asset(
+          'assets/images/loading.gif',
+          // height: 125.0,
+          width: 125.0,
+        ),
       ),
     );
   }
