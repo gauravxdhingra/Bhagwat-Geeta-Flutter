@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:animations/animations.dart';
 import 'package:bhagwat_geeta/pages/app_pageview.dart';
+import 'package:bhagwat_geeta/pages/play_audio.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -105,6 +106,7 @@ class MyApp extends StatelessWidget {
           ChapterViewPage.routeName: (context) => ChapterViewPage(),
           VerseViewPage.routeName: (context) => VerseViewPage(),
           SearchScreen.routeName: (context) => SearchScreen(),
+          PlayAudio.routeName: (context) => PlayAudio(),
         },
       ),
     );

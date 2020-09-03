@@ -30,34 +30,76 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body:
-          // Center(
-          //   child: Image.asset(
-          //     'assets/images/loading.gif',
-          //     // height: 125.0,
-          //     width: 125.0,
-          //   ),
-          // ),
-          loading
-              ? CircularProgressIndicator()
-              : Column(
-                  children: [
-                    ListTile(
-                      onTap: () async {
-                        x.toMap()["lang"]["lang"] == "eng"
-                            ? await x.put("lang", {"lang": "hi"})
-                            : await x.put("lang", {"lang": "eng"});
-                        print(x.toMap()["lang"]);
-                        setState(() {});
-                      },
-                      title: Text("Switch Language"),
-                      subtitle: x.toMap()["lang"]["lang"] == "eng"
-                          ? Text("English")
-                          : Text("Hindi"),
-                    ),
-                  ],
-                ),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text("Settings")),
+        body:
+            // Center(
+            //   child: Image.asset(
+            //     'assets/images/loading.gif',
+            //     // height: 125.0,
+            //     width: 125.0,
+            //   ),
+            // ),
+            loading
+                ? CircularProgressIndicator()
+                : Column(
+                    children: [
+                      ListTile(
+                        onTap: () async {
+                          x.toMap()["lang"]["lang"] == "eng"
+                              ? await x.put("lang", {"lang": "hi"})
+                              : await x.put("lang", {"lang": "eng"});
+                          print(x.toMap()["lang"]);
+                          setState(() {});
+                        },
+                        title: Text("Switch Language"),
+                        subtitle: x.toMap()["lang"]["lang"] == "eng"
+                            ? Text("English")
+                            : Text("Hindi"),
+                      ),
+                      ListTile(
+                        onTap: () async {
+                          x.toMap()["lang"]["lang"] == "eng"
+                              ? await x.put("lang", {"lang": "hi"})
+                              : await x.put("lang", {"lang": "eng"});
+                          print(x.toMap()["lang"]);
+                          setState(() {});
+                        },
+                        title: Text("Switch Language"),
+                        subtitle: x.toMap()["lang"]["lang"] == "eng"
+                            ? Text("English")
+                            : Text("Hindi"),
+                      ),
+                      ListTile(
+                        onTap: () async {
+                          x.toMap()["lang"]["lang"] == "eng"
+                              ? await x.put("lang", {"lang": "hi"})
+                              : await x.put("lang", {"lang": "eng"});
+                          print(x.toMap()["lang"]);
+                          setState(() {});
+                        },
+                        title: Text("Switch Language"),
+                        subtitle: x.toMap()["lang"]["lang"] == "eng"
+                            ? Text("English")
+                            : Text("Hindi"),
+                      ),
+                      ListTile(
+                        onTap: () async {
+                          x.toMap()["lang"]["lang"] == "eng"
+                              ? await x.put("lang", {"lang": "hi"})
+                              : await x.put("lang", {"lang": "eng"});
+                          print(x.toMap()["lang"]);
+                          setState(() {});
+                        },
+                        title: Text("Switch Language"),
+                        subtitle: x.toMap()["lang"]["lang"] == "eng"
+                            ? Text("English")
+                            : Text("Hindi"),
+                      ),
+                    ],
+                  ),
+      ),
     );
   }
 }

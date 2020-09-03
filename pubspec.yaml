@@ -44,6 +44,7 @@ dependencies:
   flutter_spinkit: ^4.1.2+1
   flutter_picker: ^1.1.5
   animations: ^1.1.2
+  blur_bottom_bar: ^1.0.1
 
 dev_dependencies:
   hive_generator: ^0.7.1

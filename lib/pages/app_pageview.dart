@@ -1,6 +1,8 @@
 import 'package:bhagwat_geeta/pages/favourites_page.dart';
 import 'package:bhagwat_geeta/pages/homepage.dart';
 import 'package:bhagwat_geeta/pages/settings_page.dart';
+import 'package:bhagwat_geeta/theme/theme.dart';
+import 'package:blur_bottom_bar/blur_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 class AppPageview extends StatefulWidget {
@@ -18,33 +20,34 @@ class _AppPageviewState extends State<AppPageview> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: PageView(
-          controller: _controller,
+        body: Stack(
           children: [
-            HomePage(),
-            FavouritesPage(),
-            SettingsPage(),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          fixedColor: Theme.of(context).primaryColor,
-          elevation: 30,
-          unselectedIconTheme: IconThemeData(color: Colors.grey),
-          type: BottomNavigationBarType.shifting,
-          onTap: (i) {
-            setState(() {
-              index = i;
-            });
-            _controller.jumpToPage(i);
-          },
-          currentIndex: index,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home), title: Text("Home")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.favorite), title: Text("Favourites")),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings), title: Text("Settings")),
+            PageView(
+              controller: _controller,
+              children: [
+                HomePage(),
+                FavouritesPage(),
+                SettingsPage(),
+              ],
+            ),
+            BlurBottomView(
+              selectedItemColor: Themes.primaryColor,
+              bottomNavigationBarItems: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.home), title: Text("Home")),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.favorite), title: Text("Favourites")),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.settings), title: Text("Settings")),
+              ],
+              onIndexChange: (i) {
+                setState(() {
+                  index = i;
+                });
+                _controller.jumpToPage(i);
+              },
+              currentIndex: index,
+            ),
           ],
         ),
       ),

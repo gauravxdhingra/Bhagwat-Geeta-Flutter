@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:bhagwat_geeta/pages/play_audio.dart';
 import 'package:blurhash/blurhash.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -183,7 +184,55 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(fontSize: 15))),
                         SizedBox(height: 30),
-                        Text("Go To Verse", textAlign: TextAlign.center),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) => Dialog(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ListTile(
+                                                  title: Text("English"),
+                                                  onTap: () {
+                                                    Navigator.pushNamed(context,
+                                                        PlayAudio.routeName,
+                                                        arguments: {
+                                                          "lang": "eng"
+                                                        });
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  title: Text("Hindi"),
+                                                  onTap: () {
+                                                    Navigator.pushNamed(context,
+                                                        PlayAudio.routeName,
+                                                        arguments: {
+                                                          "lang": "hi"
+                                                        });
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  title: Text("Sanskrit"),
+                                                  onTap: () {
+                                                    Navigator.pushNamed(context,
+                                                        PlayAudio.routeName,
+                                                        arguments: {
+                                                          "lang": "sans"
+                                                        });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ));
+                                },
+                                child: Text("Play Audio")),
+                            Text("Go To Verse"),
+                          ],
+                        ),
                         if (!_isLoading)
                           Padding(
                               padding: const EdgeInsets.only(
@@ -267,9 +316,8 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: InkWell(
         onTap: () {
-          Navigator.pushNamed(context, VerseViewPage.routeName, arguments: {
-            "verseUrl": verses[i]["url"],
-          });
+          Navigator.pushNamed(context, VerseViewPage.routeName,
+              arguments: {"verseUrl": verses[i]["url"]});
         },
         child: Container(
           width: double.infinity,
@@ -288,7 +336,11 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(verses[i]["verseNo"], style: Themes.homeChapterHead),
+                  Text(
+                      hive.toMap()["lang"]["lang"] == "eng"
+                          ? verses[i]["verseNo"]
+                          : "श्लोक" + verses[i]["verseNo"].split("Verse")[1],
+                      style: Themes.homeChapterHead),
                   Text(
                     verses[i]["verse"],
                     style: TextStyle(color: Colors.white),
