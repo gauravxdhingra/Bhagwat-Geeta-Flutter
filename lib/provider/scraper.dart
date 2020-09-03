@@ -58,7 +58,7 @@ class Scraper with ChangeNotifier {
     return verses;
   }
 
-  Map<String, String> getFullVerse(dom.Document document) {
+  Map<String, String> getFullVerse(dom.Document document, {bool eng = false}) {
     Map<String, String> verse = {};
     String title = "";
     String verseSanskrit = "";
@@ -67,9 +67,21 @@ class Scraper with ChangeNotifier {
     String translation = "";
 
     title = document.getElementsByClassName("font-up font-bold mt-2")[0].text;
+    if (!eng) {
+      title = "अध्याय" +
+          title.split("Chapter")[1].split(",")[0] +
+          ", " +
+          "श्लोक" +
+          title.split("Verse")[1];
+      // title.replaceAll("Chapter", "अध्याय");
+      // title.replaceAll("Verse", "श्लोक");
+      print(title);
+    }
+
     verseSanskrit = document.getElementsByClassName("verse-sanskrit")[0].text;
-    transliteration =
-        document.getElementsByClassName("verse-transliteration")[0].text;
+    if (eng)
+      transliteration =
+          document.getElementsByClassName("verse-transliteration")[0].text;
     wordMeanings = document.getElementsByClassName("verse-word")[0].text;
     translation = document.getElementsByClassName("verse-meaning")[0].text;
 

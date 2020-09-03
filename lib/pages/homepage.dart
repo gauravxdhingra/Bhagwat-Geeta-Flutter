@@ -7,6 +7,7 @@ import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,24 +22,37 @@ class _HomePageState extends State<HomePage> {
   bool init = false;
 
   Map<String, String> chapters = {};
+  Box<Map> x;
+  String url = "";
+  Scraper provider;
 
   @override
   void didChangeDependencies() async {
     if (!init) {
-      String url = "https://bhagavadgita.io";
-      // "https://bhagavadgita.io/chapter/1/?page=1";
-
-      final provider = Provider.of<Scraper>(context);
-      final document = await provider.getWebpage(url);
-      chapters = await provider.getChapters(document);
-      // buildChapterSelectionMap();
+      await getData();
       setState(() {
         _isLoading = false;
         init = true;
       });
     }
-
     super.didChangeDependencies();
+  }
+
+  // "https://bhagavadgita.io/chapter/1/?page=1";
+  getData() async {
+    provider = Provider.of<Scraper>(context);
+    x = await Hive.openBox<Map>("Geeta");
+    var lang = x.get("lang");
+    if (lang == null || lang.toString() == "") {
+      x.put("lang", {"lang": "eng"});
+    }
+    if (x.toMap()["lang"]["lang"] == "eng")
+      url = "https://bhagavadgita.io";
+    else
+      url = "https://bhagavadgita.io/hi";
+
+    final document = await provider.getWebpage(url);
+    chapters = await provider.getChapters(document);
   }
 
   showPicker() {

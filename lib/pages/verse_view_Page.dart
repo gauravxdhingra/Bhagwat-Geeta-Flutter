@@ -38,6 +38,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
   Map<String, String> verse = {};
   int chapterNo;
   int verseNo;
+  Box<Map> hive;
   @override
   void didChangeDependencies() async {
     if (!init) {
@@ -50,10 +51,20 @@ class _VerseViewPageState extends State<VerseViewPage> {
       // print(data[int.parse(verseUrl.split("/chapter/")[1].split("/")[0]) - 1]
       //         [verseUrl.split("/chapter/")[1].split("/")[0]]
       //     .length);
+      hive = await Hive.openBox<Map>("Geeta");
+
       String url = "https://bhagavadgita.io" + verseUrl;
-      print(url);
-      final document = await provider.getWebpage(url);
-      verse = provider.getFullVerse(document);
+      if (hive.toMap()["lang"]["lang"] == "eng") {
+        url = "https://bhagavadgita.io" + verseUrl;
+        print(url);
+        final document = await provider.getWebpage(url);
+        verse = provider.getFullVerse(document, eng: true);
+      } else {
+        url = "https://bhagavadgita.io" + verseUrl + "hi/";
+        print(url);
+        final document = await provider.getWebpage(url);
+        verse = provider.getFullVerse(document, eng: false);
+      }
 
       final _random = new Random();
       int next(int min, int max) => min + _random.nextInt(max - min);
@@ -61,12 +72,10 @@ class _VerseViewPageState extends State<VerseViewPage> {
       if (number == 115 || number == 133) number = 101;
       imageUrl =
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
-      print(imageUrl);
-
-      var x = await Hive.openBox<Map>("Geeta").then((value) => value.toMap());
+      // print(imageUrl);
+      var x = hive.toMap();
       blurhashString = x["blurhash"]["$number"];
-      print(blurhashString);
-
+      // print(blurhashString);
       imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
 
       // var yt = YoutubeExplode();
@@ -83,36 +92,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
       // print(streamInfo);
 
       // yt.close();
-
-// BLURHASH
-      // Future<String> blurHashEncode(i) async {
-      //   Uint8List fileData =
-      //       await (rootBundle.load("assets/images/GeetaImages/$i.jpg"))
-      //           .then((value) => value.buffer.asUint8List());
-      //   img.Image image = img.decodeImage(fileData.toList());
-
-      //   final blurHash = encodeBlurHash(
-      //     image.getBytes(format: Format.rgba),
-      //     image.width,
-      //     image.height,
-      //   );
-
-      //   print("$blurHash");
-      //   return blurHash;
-      // }
-
-      // for (int i = 100; i <= 114; i++) {
-      //   print('$i\n');
-      //   await blurHashEncode(i);
-      // }
-      // for (int i = 116; i <= 132; i++) {
-      //   print('$i\n');
-      //   await blurHashEncode(i);
-      // }
-      // for (int i = 134; i <= 140; i++) {
-      //   print('$i\n');
-      //   await blurHashEncode(i);
-      // }
+      print(verse);
     }
     setState(() {
       _isLoading = false;
@@ -211,27 +191,36 @@ class _VerseViewPageState extends State<VerseViewPage> {
               textAlign: TextAlign.center),
 
           Container(
-            width: double.infinity,
-            alignment: Alignment.centerRight,
-            child: Icon(FlutterIcons.quote_right_faw,
-                color: Theme.of(context).primaryColor),
-          ),
+              width: double.infinity,
+              alignment: Alignment.centerRight,
+              child: Icon(FlutterIcons.quote_right_faw,
+                  color: Theme.of(context).primaryColor)),
           // TODO IF ENGLISH
 
-          SizedBox(height: 20),
-          buildTitle("Transliteration"), SizedBox(height: 10),
-          Text(verse["transliteration"],
-              style: TextStyle(fontSize: 17, fontStyle: FontStyle.italic),
-              textAlign: TextAlign.center),
+          if (hive.toMap()["lang"]["lang"] == "eng") SizedBox(height: 20),
+          if (hive.toMap()["lang"]["lang"] == "eng")
+            buildTitle("Transliteration"),
+          SizedBox(height: 10),
+          if (hive.toMap()["lang"]["lang"] == "eng")
+            Text(verse["transliteration"],
+                style: TextStyle(fontSize: 17, fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center),
 
 // —
-          SizedBox(height: 30),
-          buildTitle("Translation"), SizedBox(height: 10),
+          SizedBox(height: 20),
+          //  शब्दार्थ   word meanings
+          // अनुवाद   translation
+          buildTitle(
+              hive.toMap()["lang"]["lang"] == "eng" ? "Translation" : "अनुवाद"),
+          SizedBox(height: 10),
           Text(verse["translation"],
               style: TextStyle(fontSize: 17), textAlign: TextAlign.center),
 
           SizedBox(height: 50),
-          buildTitle("Word Meanings"), SizedBox(height: 15),
+          buildTitle(hive.toMap()["lang"]["lang"] == "eng"
+              ? "Word Meanings"
+              : "शब्दार्थ"),
+          SizedBox(height: 15),
           for (int i = 0; i < verse["wordMeanings"].split("; ").length; i++)
             Column(
               children: [
@@ -242,7 +231,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
                 SizedBox(height: 7),
               ],
             ),
-          SizedBox(height: 30),
+          SizedBox(height: 90),
         ]),
       ),
     );
@@ -257,11 +246,9 @@ class _VerseViewPageState extends State<VerseViewPage> {
                 color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(5)),
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Text(
-              text,
-              style: TextStyle(
-                  color: Colors.white, fontSize: 22, fontFamily: "Samarkan"),
-            ),
+            child: Text(text,
+                style: TextStyle(
+                    color: Colors.white, fontSize: 22, fontFamily: "Samarkan")),
           ),
         ),
       );
@@ -308,3 +295,33 @@ class _VerseViewPageState extends State<VerseViewPage> {
     );
   }
 }
+
+// BLURHASH
+// Future<String> blurHashEncode(i) async {
+//   Uint8List fileData =
+//       await (rootBundle.load("assets/images/GeetaImages/$i.jpg"))
+//           .then((value) => value.buffer.asUint8List());
+//   img.Image image = img.decodeImage(fileData.toList());
+
+//   final blurHash = encodeBlurHash(
+//     image.getBytes(format: Format.rgba),
+//     image.width,
+//     image.height,
+//   );
+
+//   print("$blurHash");
+//   return blurHash;
+// }
+
+// for (int i = 100; i <= 114; i++) {
+//   print('$i\n');
+//   await blurHashEncode(i);
+// }
+// for (int i = 116; i <= 132; i++) {
+//   print('$i\n');
+//   await blurHashEncode(i);
+// }
+// for (int i = 134; i <= 140; i++) {
+//   print('$i\n');
+//   await blurHashEncode(i);
+// }

@@ -42,6 +42,9 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   String blurhashString = "LUK1Q^01WCWF_MD%t3WE4;%KV[of";
   Uint8List imageDataBytes;
 
+  Box<Map> hive;
+  String url = "";
+
   @override
   void didChangeDependencies() async {
     if (!init) {
@@ -52,19 +55,37 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
       provider = Provider.of<Scraper>(context);
 
-      String url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
-      final document = await provider.getWebpage(url + "1");
+      hive = await Hive.openBox<Map>("Geeta");
+      var lang = hive.get("lang");
+      if (lang == null || lang.toString() == "") {
+        hive.put("lang", {"lang": "eng"});
+      }
+      var document;
+      url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
+
+      if (hive.toMap()["lang"]["lang"] == "eng") {
+        document = await provider.getWebpage(
+            "https://bhagavadgita.io/chapter/$chapterNumber/?page=" + "1");
+      } else {
+        document = await provider.getWebpage(
+            "https://bhagavadgita.io/chapter/$chapterNumber/hi/?page=" + "1");
+      }
+      // document = await provider.getWebpage(url + "1");
       pages = provider.getTotalPagesChapter(document);
       chapterDetails = provider.getChapterDetails(document);
       chapterHeading = document
           .getElementsByClassName("hanuman-gradient-text")[0]
           .getElementsByTagName("h2")[0]
           .text;
+      if (hive.toMap()["lang"]["lang"] == "hi")
+        chapterHeading = "अध्याय" + chapterHeading.split("Chapter")[1];
       chapterMeaning = document
           .getElementsByClassName("hanuman-gradient-text")[0]
           .getElementsByTagName("h3")[0]
           .text;
       verses = provider.getVersesFromPage(document);
+
+      print(chapterHeading);
 
       final _random = new Random();
       int next(int min, int max) => min + _random.nextInt(max - min);
@@ -110,8 +131,14 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
     setState(() {
       isGettingMore = true;
     });
-    String url = "https://bhagavadgita.io/chapter/$chapter/?page=$page";
-    final document = await provider.getWebpage(url);
+    var document;
+    if (hive.toMap()["lang"]["lang"] == "eng") {
+      document = await provider
+          .getWebpage("https://bhagavadgita.io/chapter/$chapter/?page=$page");
+    } else {
+      document = await provider.getWebpage(
+          "https://bhagavadgita.io/chapter/$chapter/hi/?page=$page");
+    }
 
     verses.addAll(provider.getVersesFromPage(document));
     setState(() {
@@ -156,7 +183,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(fontSize: 15))),
                         SizedBox(height: 30),
-                        if (_isLoading) CircularProgressIndicator(),
+                        Text("Go To Verse", textAlign: TextAlign.center),
                         if (!_isLoading)
                           Padding(
                               padding: const EdgeInsets.only(
@@ -181,15 +208,6 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                   ),
                 ],
               ),
-        // floatingActionButton: chapterNumber < 18
-        //     ? FloatingActionButton.extended(
-        //         label: Text("Next Chapter"),
-        //         onPressed: () {},
-        //         backgroundColor: Colors.red[700],
-        //         icon: Icon(Icons.navigate_next),
-        //         // Themes.primaryColor,
-        //       )
-        // : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: _isLoading
             ? null
@@ -274,6 +292,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                   Text(
                     verses[i]["verse"],
                     style: TextStyle(color: Colors.white),
+                    maxLines: 5,
                   ),
                 ],
               ),
