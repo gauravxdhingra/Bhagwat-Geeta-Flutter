@@ -86,13 +86,13 @@ class _VerseViewPageState extends State<VerseViewPage> {
       imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
 
       print(verse);
-      ImageDownloader.callback(
-          onProgressUpdate: (String imageId, int progress) {
-        setState(() {
-          _progress = progress.toDouble() / 100;
-          print(progress);
-        });
-      });
+      // ImageDownloader.callback(
+      //     onProgressUpdate: (String imageId, int progress) {
+      //   setState(() {
+      //     _progress = progress * 0.01;
+      //     print(_progress);
+      //   });
+      // });
       setState(() {
         _isLoading = false;
         init = true;
@@ -106,16 +106,18 @@ class _VerseViewPageState extends State<VerseViewPage> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => Dialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  CircularProgressIndicator(value: _progress.toDouble()),
-                  SizedBox(width: 20),
-                  Text("Loading...")
-                ]))));
+        builder: (context) => StatefulBuilder(
+              builder: (context, setState) => Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 20),
+                        Text("Loading...")
+                      ]))),
+            ));
 
     String fileName = imageUrl.split("gita-")[1].split(".")[0] + ".jpg";
 
@@ -134,7 +136,12 @@ class _VerseViewPageState extends State<VerseViewPage> {
       print(error);
     }
     Navigator.pushReplacementNamed(context, ScreenshotScreen.routeName,
-        arguments: image);
+        arguments: {
+          "image": image,
+          "verseSanskrit": verse["verseSanskrit"],
+          "translation": verse["translation"],
+          "title": verse["title"],
+        });
   }
 
   @override

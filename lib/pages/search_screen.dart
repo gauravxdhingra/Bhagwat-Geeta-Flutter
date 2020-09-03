@@ -56,10 +56,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: InkWell(
                     onTap: () {
-                      Navigator.pushNamed(
-                          context, VerseViewPage.routeName, arguments: {
-                        "verseUrl": searchResults.values.elementAt(i)["link"]
-                      });
+                      Navigator.pushNamed(context, VerseViewPage.routeName,
+                          arguments: {
+                            "verseUrl":
+                                searchResults.values.elementAt(i)["link"] + "/"
+                          });
                     },
                     child: Stack(
                       children: [

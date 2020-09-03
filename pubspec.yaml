@@ -49,6 +49,8 @@ dependencies:
   just_audio: ^0.4.1
   network_to_file_image: ^2.3.2
   image_downloader: ^0.20.0
+  blurrycontainer: ^0.0.1
+  screenshot: ^0.2.0
 
 dev_dependencies:
   hive_generator: ^0.7.1
