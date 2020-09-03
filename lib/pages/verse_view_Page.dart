@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:bhagwat_geeta/pages/screenshot_page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:blurhash/blurhash.dart';
@@ -11,6 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:hive/hive.dart';
+import 'package:image_downloader/image_downloader.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 // import 'package:image/image.dart';
 import 'package:provider/provider.dart';
 import 'package:image/image.dart' as img;
@@ -39,6 +44,9 @@ class _VerseViewPageState extends State<VerseViewPage> {
   int chapterNo;
   int verseNo;
   Box<Map> hive;
+  File image;
+  double _progress = 0.0;
+
   @override
   void didChangeDependencies() async {
     if (!init) {
@@ -72,33 +80,61 @@ class _VerseViewPageState extends State<VerseViewPage> {
       if (number == 115 || number == 133) number = 101;
       imageUrl =
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
-      // print(imageUrl);
+
       var x = hive.toMap();
       blurhashString = x["blurhash"]["$number"];
-      // print(blurhashString);
       imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
 
-      // var yt = YoutubeExplode();
-      // var video =
-      //     await yt.videos.get('https://www.youtube.com/watch?v=bo_efYhYU2A');
-
-      // print('Title: ${video.title}');
-
-      // // var yt = YoutubeExplode();
-
-      // var manifest = await yt.videos.streamsClient.getManifest('bnsUkE8i0tU');
-      // // var streamInfo = streamManifest.audioOnly.withHigestBitrate();
-      // print(manifest.audio.last.url);
-      // print(streamInfo);
-
-      // yt.close();
       print(verse);
+      ImageDownloader.callback(
+          onProgressUpdate: (String imageId, int progress) {
+        setState(() {
+          _progress = progress.toDouble() / 100;
+          print(progress);
+        });
+      });
+      setState(() {
+        _isLoading = false;
+        init = true;
+      });
     }
-    setState(() {
-      _isLoading = false;
-      init = true;
-    });
+
     super.didChangeDependencies();
+  }
+
+  passImage() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  CircularProgressIndicator(value: _progress.toDouble()),
+                  SizedBox(width: 20),
+                  Text("Loading...")
+                ]))));
+
+    String fileName = imageUrl.split("gita-")[1].split(".")[0] + ".jpg";
+
+    try {
+      var imageId = await ImageDownloader.downloadImage(imageUrl,
+          destination: AndroidDestinationType.custom(directory: "")
+            ..inExternalFilesDir()
+            ..subDirectory(fileName));
+      print(imageId);
+      if (imageId == null) {
+        return;
+      }
+      var path = await ImageDownloader.findPath(imageId);
+      image = File(path);
+    } on PlatformException catch (error) {
+      print(error);
+    }
+    Navigator.pushReplacementNamed(context, ScreenshotScreen.routeName,
+        arguments: image);
   }
 
   @override
@@ -107,12 +143,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
       child: Scaffold(
         body: _isLoading
             ? Center(
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  // height: 125.0,
-                  width: 125.0,
-                ),
-              )
+                child: Image.asset('assets/images/loading.gif', width: 125.0))
             : CustomScrollView(
                 physics: BouncingScrollPhysics(),
                 slivers: [buildSliverAppBar(context), buildSliverBody(context)],
@@ -166,6 +197,58 @@ class _VerseViewPageState extends State<VerseViewPage> {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  SliverAppBar buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: MediaQuery.of(context).size.height / 3,
+      pinned: true,
+      centerTitle: true,
+      stretch: true,
+      actions: [
+        IconButton(
+          icon: Icon(Icons.translate),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(Icons.favorite),
+          onPressed: () {},
+        ),
+        IconButton(
+          icon: Icon(FlutterIcons.share_2_fea),
+          onPressed: () async {
+            await passImage();
+          },
+        ),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+        centerTitle: false,
+        collapseMode: CollapseMode.parallax,
+        title: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(4)),
+            child: Text(verse["title"],
+                style: TextStyle(fontFamily: 'Samarkan'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center)),
+        background: Container(
+            decoration:
+                BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
+            child: Container(
+                child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (BuildContext context, String url) => Image.memory(
+                  imageDataBytes,
+                  fit: BoxFit.cover,
+                  width: double.infinity),
+            ))),
       ),
     );
   }
@@ -252,48 +335,6 @@ class _VerseViewPageState extends State<VerseViewPage> {
           ),
         ),
       );
-
-  SliverAppBar buildSliverAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height / 3,
-      pinned: true,
-      centerTitle: true,
-      stretch: true,
-      actions: [
-        // IconButton(
-        //   icon: Icon(FlutterIcons.share_2_fea),
-        //   onPressed: () {},
-        // )
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-        centerTitle: false,
-        collapseMode: CollapseMode.parallax,
-        title: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(4)),
-            child: Text(verse["title"],
-                style: TextStyle(fontFamily: 'Samarkan'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center)),
-        background: Container(
-            decoration:
-                BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
-            child: Container(
-                child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (BuildContext context, String url) => Image.memory(
-                  imageDataBytes,
-                  fit: BoxFit.cover,
-                  width: double.infinity),
-            ))),
-      ),
-    );
-  }
 }
 
 // BLURHASH
