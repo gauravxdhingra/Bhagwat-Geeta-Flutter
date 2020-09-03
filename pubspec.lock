@@ -209,6 +209,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.1"
+  flutter_exoplayer:
+    dependency: "direct main"
+    description:
+      name: flutter_exoplayer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.5"
   flutter_icons:
     dependency: "direct main"
     description:
@@ -240,6 +247,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_xlider:
+    dependency: "direct main"
+    description:
+      name: flutter_xlider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.4.0"
   glob:
     dependency: transitive
     description:

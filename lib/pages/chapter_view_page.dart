@@ -198,30 +198,39 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                                                 ListTile(
                                                   title: Text("English"),
                                                   onTap: () {
+                                                    Navigator.pop(context);
                                                     Navigator.pushNamed(context,
                                                         PlayAudio.routeName,
                                                         arguments: {
-                                                          "lang": "eng"
+                                                          "lang": "eng",
+                                                          "chapterNo":
+                                                              chapterNumber,
                                                         });
                                                   },
                                                 ),
                                                 ListTile(
                                                   title: Text("Hindi"),
                                                   onTap: () {
+                                                    Navigator.pop(context);
                                                     Navigator.pushNamed(context,
                                                         PlayAudio.routeName,
                                                         arguments: {
-                                                          "lang": "hi"
+                                                          "lang": "hi",
+                                                          "chapterNo":
+                                                              chapterNumber,
                                                         });
                                                   },
                                                 ),
                                                 ListTile(
                                                   title: Text("Sanskrit"),
                                                   onTap: () {
+                                                    Navigator.pop(context);
                                                     Navigator.pushNamed(context,
                                                         PlayAudio.routeName,
                                                         arguments: {
-                                                          "lang": "sans"
+                                                          "lang": "sans",
+                                                          "chapterNo":
+                                                              chapterNumber,
                                                         });
                                                   },
                                                 ),
