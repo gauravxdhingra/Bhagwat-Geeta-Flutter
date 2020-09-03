@@ -43,6 +43,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.2"
+  audio_session:
+    dependency: transitive
+    description:
+      name: audio_session
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   blur_bottom_bar:
     dependency: "direct main"
     description:
@@ -209,13 +216,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.1"
-  flutter_exoplayer:
-    dependency: "direct main"
-    description:
-      name: flutter_exoplayer
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.5.5"
   flutter_icons:
     dependency: "direct main"
     description:
@@ -324,6 +324,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.2"
+  just_audio:
+    dependency: "direct main"
+    description:
+      name: just_audio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.1"
   logging:
     dependency: transitive
     description:
