@@ -141,6 +141,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
           "verseSanskrit": verse["verseSanskrit"],
           "translation": verse["translation"],
           "title": verse["title"],
+          "lang": hive.toMap()["lang"]["lang"]
         });
   }
 

@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:share/share.dart';
 
 class ScreenshotScreen extends StatefulWidget {
   ScreenshotScreen({Key key}) : super(key: key);
@@ -20,6 +25,8 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
   String translation = "";
   String title = "";
   ScreenshotController screenshotController = ScreenshotController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  String lang = "";
 
   int _counter = 0;
   File _imageFile;
@@ -32,6 +39,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
       title = args["title"];
       verseSanskrit = args["verseSanskrit"];
       translation = args["translation"];
+      lang = args["lang"];
 
       setState(() {
         loading = false;
@@ -41,17 +49,56 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
     super.didChangeDependencies();
   }
 
+  Future<String> saveToDevice() async {
+    if (_imageFile == null) {
+      await screenshotController.capture(pixelRatio: 2.5).then((File image) {
+        setState(() {
+          _imageFile = image;
+        });
+      }).catchError((onError) {
+        print(onError);
+      });
+    }
+    Uint8List save = await _imageFile.readAsBytes();
+    final result = await ImageGallerySaver.saveImage(save,
+        quality: 100,
+        name: lang == "eng"
+            ? "Bhagwat Geeta - $title"
+            : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi");
+    print(title);
+    print(result);
+    return result.toString().replaceAll("%20", " ").replaceAll("%2C", ",");
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text(
+            "Share",
+            style: TextStyle(color: Themes.primaryColor),
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            color: Themes.primaryColor,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
         body: loading
             ? CircularProgressIndicator()
             : Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Screenshot(
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.lerp(
+                          Alignment.center, Alignment.topCenter, 0.2),
+                      child: Screenshot(
                         controller: screenshotController,
                         child: Container(
                           width: MediaQuery.of(context).size.width,
@@ -148,32 +195,58 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                           ),
                         ),
                       ),
-                      // if (_imageFile != null)
-                      //   Image.file(
-                      //     _imageFile,
-                      //     // height: 200,
-                      //     // width: 200,
-                      //   ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.share),
-                            onPressed: () {
-                              screenshotController
-                                  .capture(pixelRatio: 2.5)
-                                  .then((File image) {
-                                setState(() {
-                                  _imageFile = image;
-                                });
-                              }).catchError((onError) {
-                                print(onError);
-                              });
-                            },
-                          ),
-                        ],
+                    ),
+                    // if (_imageFile != null)
+                    //   Image.file(
+                    //     _imageFile,
+                    //     // height: 200,
+                    //     // width: 200,
+                    //   ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 50),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.save_alt),
+                                color: Themes.primaryColor,
+                                iconSize: 35,
+                                onPressed: () async {
+                                  await saveToDevice();
+                                  final SnackBar snackBar = SnackBar(
+                                    content: Text("Saved To Gallery"),
+                                  );
+                                  _scaffoldKey.currentState
+                                      .showSnackBar(snackBar);
+                                }),
+                            IconButton(
+                              icon: Icon(Icons.share),
+                              color: Themes.primaryColor,
+                              iconSize: 33,
+                              onPressed: () async {
+                                var res = await saveToDevice();
+
+                                res = res
+                                    .split("file://")[1]
+                                    .replaceAll("%20", " ")
+                                    .replaceAll("%2C", ",");
+                                Share.shareFiles([res],
+                                    text: "Bhagwat Geeta\n" +
+                                        title +
+                                        "\n\n" +
+                                        verseSanskrit.trim() +
+                                        "\n\n" +
+                                        translation.trim() +
+                                        "\n\n Download From Google Play\n url");
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
       ),

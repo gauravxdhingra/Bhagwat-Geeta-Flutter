@@ -140,7 +140,7 @@ class _PlayAudioState extends State<PlayAudio> {
 
   @override
   Widget build(BuildContext context) {
-    print(player.position.inSeconds.toString());
+    // print(player.position.inSeconds.toString());
     return SafeArea(
         child: Scaffold(
       body: loading

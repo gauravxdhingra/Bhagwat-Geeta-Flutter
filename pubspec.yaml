@@ -51,6 +51,8 @@ dependencies:
   image_downloader: ^0.20.0
   blurrycontainer: ^0.0.1
   screenshot: ^0.2.0
+  image_gallery_saver: ^1.5.0
+  share: ^0.6.5
 
 dev_dependencies:
   hive_generator: ^0.7.1

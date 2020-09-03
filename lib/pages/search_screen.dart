@@ -13,6 +13,11 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   Map searchResults = {};
+  TextEditingController _searchController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   getSearchResults(String query) async {
     showDialog(
@@ -118,6 +123,8 @@ class _SearchScreenState extends State<SearchScreen> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
             child: TextFormField(
+                controller: _searchController,
+                autofocus: true,
                 onFieldSubmitted: (query) async {
                   getSearchResults(query);
                 },
