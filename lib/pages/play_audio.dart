@@ -33,6 +33,8 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer player;
   var x;
   Duration duration;
+  Duration position;
+  Duration buffPosition;
   StreamSubscription<AudioProcessingState> _playerStateSubscription;
 
   @override
@@ -76,24 +78,34 @@ class _PlayAudioState extends State<PlayAudio> {
       print(duration);
       player.play();
 
-      player.playerStateStream.listen((state) {
-        if (state.playing) {
-        } else {
-          switch (state.processingState) {
-            case AudioProcessingState.none:
-              break;
-            case AudioProcessingState.loading:
-              break;
-            case AudioProcessingState.buffering:
-              break;
-            case AudioProcessingState.ready:
-              break;
-            case AudioProcessingState.completed:
-              break;
-          }
-        }
+      // player.playerStateStream.listen((state) {
+      //   if (state.playing) {
+      //   } else {
+      //     switch (state.processingState) {
+      //       case AudioProcessingState.none:
+      //         break;
+      //       case AudioProcessingState.loading:
+      //         break;
+      //       case AudioProcessingState.buffering:
+      //         break;
+      //       case AudioProcessingState.ready:
+      //         break;
+      //       case AudioProcessingState.completed:
+      //         break;
+      //     }
+      //   }
+      // });
+      player.positionStream.listen((event) {
+        position = event;
+        setState(() {});
+        print(event);
       });
 
+      player.bufferedPositionStream.listen((event) {
+        buffPosition = event;
+        setState(() {});
+        print(event);
+      });
 // See also:
 // - durationStream
 // - positionStream
@@ -184,10 +196,13 @@ class _PlayAudioState extends State<PlayAudio> {
   @override
   Widget build(BuildContext context) {
     // print(player.position.inSeconds.toString());
+    // print(player.position.inMilliseconds);
     return SafeArea(
         child: Scaffold(
       body: loading
-          ? CircularProgressIndicator()
+          ? Center(
+              child: Image.asset('assets/images/loading.gif',
+                  height: 125.0, width: 125.0))
           : Stack(
               children: [
                 Container(
@@ -245,29 +260,71 @@ class _PlayAudioState extends State<PlayAudio> {
                           ),
                         ],
                       ),
-                      FlutterSlider(
-                        values: [_lowerValue],
-                        max: duration.inSeconds.toDouble(),
-                        min: 0,
-                        onDragCompleted:
-                            (handlerIndex, lowerValue, upperValue) async {
-                          _lowerValue = lowerValue;
-                          _upperValue = upperValue;
-                          print(lowerValue);
-                          print(x);
-                          // print(upperValue);
-                          await player
-                              .seek(Duration(seconds: lowerValue.round()));
-                          setState(() {});
-                        },
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(player.position.toString().split(".")[0]),
-                          Text(
-                            // '${player.duration.inMinutes} : ${player.duration.inSeconds % 60}'
-                            duration.toString().split(".")[0],
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: FlutterSlider(
+                              values: [
+                                // _lowerValue
+                                position.inSeconds.roundToDouble()
+                              ],
+                              max: duration.inSeconds.toDouble(),
+                              min: 0,
+                              trackBar: FlutterSliderTrackBar(
+                                  activeTrackBar: BoxDecoration(
+                                      color: Themes.primaryColor)),
+                              tooltip: FlutterSliderTooltip(
+                                  textStyle: TextStyle(
+                                      fontSize: 0.01, color: Colors.white),
+                                  boxStyle: FlutterSliderTooltipBox(
+                                      decoration: BoxDecoration(
+                                          color: Colors.transparent))),
+                              handlerAnimation: FlutterSliderHandlerAnimation(
+                                  curve: Curves.elasticOut,
+                                  reverseCurve: Curves.bounceIn,
+                                  duration: Duration(milliseconds: 500),
+                                  scale: 1.5),
+                              handler: FlutterSliderHandler(
+                                  decoration:
+                                      BoxDecoration(shape: BoxShape.circle),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(3),
+                                    child: Material(
+                                        type: MaterialType.canvas,
+                                        elevation: 3,
+                                        shape: CircleBorder(),
+                                        child: Container()),
+                                  )),
+                              onDragCompleted:
+                                  (handlerIndex, lowerValue, upperValue) async {
+                                _lowerValue = lowerValue;
+                                _upperValue = upperValue;
+                                print(lowerValue);
+                                print(x);
+                                await player.seek(
+                                    Duration(seconds: lowerValue.round()));
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(position
+                                    .toString()
+                                    .split(".")[0]
+                                    .replaceAll(":", " : ")),
+                                Text(duration
+                                    .toString()
+                                    .split(".")[0]
+                                    .replaceAll(":", " : ")),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -281,11 +338,10 @@ class _PlayAudioState extends State<PlayAudio> {
                   child: Row(
                     children: [
                       IconButton(
-                          icon: Icon(Icons.arrow_back_ios),
-                          color: Colors.white,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          }),
+                        icon: Icon(Icons.arrow_back_ios),
+                        color: Colors.white,
+                        onPressed: () => Navigator.pop(context),
+                      ),
                       SizedBox(width: 10),
                       Text("Chapter $chapterNo - $language",
                           style: TextStyle(
@@ -299,23 +355,4 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
     ));
   }
-}
-
-class MyBackgroundTask extends BackgroundAudioTask {
-  // Initialise your audio task.
-  onStart(Map<String, dynamic> params) {}
-  // Handle a request to stop audio and finish the task.
-  onStop() async {}
-  // Handle a request to play audio.
-  onPlay() {}
-  // Handle a request to pause audio.
-  onPause() {}
-  // Handle a headset button click (play/pause, skip next/prev).
-  onClick(MediaButton button) {}
-  // Handle a request to skip to the next queue item.
-  onSkipToNext() {}
-  // Handle a request to skip to the previous queue item.
-  onSkipToPrevious() {}
-  // Handle a request to seek to a position.
-  onSeekTo(Duration position) {}
 }
