@@ -49,6 +49,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   Box<Map> hive;
   String url = "";
   var data;
+  String language = "";
 
   @override
   void didChangeDependencies() async {
@@ -64,6 +65,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       var lang = hive.get("lang");
       if (lang == null || lang.toString() == "") {
         hive.put("lang", {"lang": "eng"});
+        language = "eng";
       }
 
       await getChapter();
@@ -81,9 +83,11 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
     url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
 
     if (hive.toMap()["lang"]["lang"] == "eng") {
+      language = "eng";
       document = await provider.getWebpage(
           "https://bhagavadgita.io/chapter/$chapterNumber/?page=" + "1");
     } else {
+      language = "hi";
       document = await provider.getWebpage(
           "https://bhagavadgita.io/chapter/$chapterNumber/hi/?page=" + "1");
     }
@@ -138,8 +142,10 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
     });
     if (hive.toMap()["lang"]["lang"] == "hi") {
       hive.put("lang", {"lang": "eng"});
+      language = "eng";
     } else {
       hive.put("lang", {"lang": "hi"});
+      language = "hi";
     }
 
     await getChapter();
@@ -250,7 +256,12 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24,
                                     color: Themes.primaryColor,
-                                    fontFamily: 'Samarkan'))),
+                                    fontFamily:
+                                        // language == "hi"
+                                        //     ?
+                                        // "KrutiDev"
+                                        // :
+                                        'Samarkan'))),
                         Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(
@@ -258,8 +269,11 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                             child: Text(_isLoading ? "" : chapterDetails,
                                 softWrap: true,
                                 style: TextStyle(
+                                    fontFamily: language == "hi"
+                                        ? "KrutiDev"
+                                        : 'Roboto',
                                     fontSize: 15,
-                                    wordSpacing: 1.1,
+                                    wordSpacing: 1.04,
                                     letterSpacing: 0.5))),
                         SizedBox(height: 30),
                         Container(
@@ -290,19 +304,24 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                                               Icon(Icons.play_arrow_rounded,
                                                   color: Colors.white),
                                               SizedBox(width: 5),
-                                              Text("Play Audio",
+                                              Text(
+                                                  language == "hi"
+                                                      ? "ऑडियो चलाएं"
+                                                      : "Play Audio",
                                                   style: TextStyle(
-                                                      color: Colors.white)),
+                                                      color: Colors.white,
+                                                      fontSize: 18)),
                                               SizedBox(width: 5),
                                             ],
                                           )),
                                     ))),
                           ),
                         ),
+                        SizedBox(height: 10),
                         Padding(
                             padding: const EdgeInsets.only(
                                 left: 15, right: 15, top: 30, bottom: 0),
-                            child: Text(_isLoading ? "" : "Verses",
+                            child: Text(language == "hi" ? "श्लोक" : "Verses",
                                 style: TextStyle(
                                     fontSize: 30,
                                     color: Themes.primaryColor,
@@ -391,13 +410,11 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                 BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor),
             child: Container(
                 child: CachedNetworkImage(
-              imageUrl: imageUrl,
-              fit: BoxFit.cover,
-              placeholder: (BuildContext context, String url) => Image.memory(
-                  imageDataBytes,
-                  fit: BoxFit.cover,
-                  width: double.infinity),
-            ))),
+                    imageUrl: imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (BuildContext context, String url) =>
+                        Image.memory(imageDataBytes,
+                            fit: BoxFit.cover, width: double.infinity)))),
       ),
     );
   }
@@ -416,15 +433,15 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
           child: Container(
             width: double.infinity,
             height: 170,
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(15)),
             child: Stack(
               children: [
                 Positioned(
-                    bottom: 0,
-                    right: 0,
+                    bottom: -5,
+                    right: -12,
                     child: Icon(Icons.navigate_next,
                         color: Colors.white, size: 35)),
                 Column(
@@ -437,7 +454,10 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                         style: Themes.homeChapterHead),
                     Text(
                       verses[i]["verse"],
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: language == "hi" ? 'KrutiDev' : "Samarkan",
+                      ),
                       maxLines: 5,
                     ),
                   ],

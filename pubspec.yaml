@@ -54,6 +54,8 @@ dependencies:
   image_gallery_saver: ^1.5.0
   share: ^0.6.5
   custom_navigation_bar: ^0.2.7
+  intl: ^0.16.1
+  audio_service: ^0.14.1
 
 dev_dependencies:
   hive_generator: ^0.7.1
@@ -91,7 +93,6 @@ flutter:
     - family: KrutiDev
       fonts:
         - asset: assets/fonts/KrutiDev.ttf
-
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

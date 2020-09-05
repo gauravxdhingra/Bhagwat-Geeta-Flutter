@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:bhagwat_geeta/theme/theme.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_exoplayer/audio_notification.dart';
-// import 'package:flutter_exoplayer/audioplayer.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yte;
+
+import '../theme/theme.dart';
 
 class PlayAudio extends StatefulWidget {
   PlayAudio({Key key}) : super(key: key);
@@ -32,6 +33,7 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer player;
   var x;
   Duration duration;
+  StreamSubscription<AudioProcessingState> _playerStateSubscription;
 
   @override
   void didChangeDependencies() async {
@@ -72,8 +74,41 @@ class _PlayAudioState extends State<PlayAudio> {
       //     "https://r5---sn-qxaeen7l.googlevideo.com/videoplayback?expire=1599126875&ei=-2hQX7H0Dsimz7sPmdibuAI&ip=110.172.189.51&id=o-APDZorRMvv0f2naSBJhfy3EURyko8bCDfYwctxdmfMVR&itag=251&source=youtube&requiressl=yes&mh=Wa&mm=31,26&mn=sn-qxaeen7l,sn-cvh76nes&ms=au,onr&mv=m&mvi=5&pl=24&initcwndbps=507500&vprv=1&mime=audio/webm&gir=yes&clen=105539586&dur=6459.781&lmt=1577276482176105&mt=1599105163&fvip=5&keepalive=yes&c=WEB&txp=1301222&sparams=expire,ei,ip,id,itag,source,requiressl,vprv,mime,gir,clen,dur,lmt&sig=AOq0QJ8wRQIgPh1da00AuBMY2DA4XeSkC3SDvYo56Q1b7Ni4h22i6MwCIQDsZtaGwlcmJA8o3bRkUFS25tqXqz7vv1viba-uNTUaeg==&lsparams=mh,mm,mn,ms,mv,mvi,pl,initcwndbps&lsig=AG3C_xAwRAIgEC2Dj4yP-wOymJpi67VNycZMMbsONrm36OfzuWQqGg8CIDN9UX-LouDJ08z98OeMOwDzMp4PgAmxk38lKV17dl-9";
 
       print(duration);
-
       player.play();
+
+      player.playerStateStream.listen((state) {
+        if (state.playing) {
+        } else {
+          switch (state.processingState) {
+            case AudioProcessingState.none:
+              break;
+            case AudioProcessingState.loading:
+              break;
+            case AudioProcessingState.buffering:
+              break;
+            case AudioProcessingState.ready:
+              break;
+            case AudioProcessingState.completed:
+              break;
+          }
+        }
+      });
+
+// See also:
+// - durationStream
+// - positionStream
+// - bufferedPositionStream
+// - sequenceStateStream
+// - sequenceStream
+// - currentIndexStream
+// - icyMetadataStream
+// - playingStream
+// - processingStateStream
+// - loopModeStream
+// - shuffleModeEnabledStream
+// - volumeStream
+// - speedStream
+// - playbackEventStream
       setState(() {
         loading = false;
         init = true;
@@ -187,7 +222,8 @@ class _PlayAudioState extends State<PlayAudio> {
                           )
                         ]),
                       ),
-                      Text("Chapter $chapterNo - $language"),
+                      Text("Chapter $chapterNo"),
+                      Text("$language"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -228,10 +264,14 @@ class _PlayAudioState extends State<PlayAudio> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('${player.position.inSeconds}'),
-                          Text(player.duration.inSeconds.toString()),
+                          Text(player.position.toString().split(".")[0]),
+                          Text(
+                            // '${player.duration.inMinutes} : ${player.duration.inSeconds % 60}'
+                            duration.toString().split(".")[0],
+                          ),
                         ],
                       ),
+                      SizedBox()
                     ],
                   ),
                 ),
@@ -259,4 +299,23 @@ class _PlayAudioState extends State<PlayAudio> {
             ),
     ));
   }
+}
+
+class MyBackgroundTask extends BackgroundAudioTask {
+  // Initialise your audio task.
+  onStart(Map<String, dynamic> params) {}
+  // Handle a request to stop audio and finish the task.
+  onStop() async {}
+  // Handle a request to play audio.
+  onPlay() {}
+  // Handle a request to pause audio.
+  onPause() {}
+  // Handle a headset button click (play/pause, skip next/prev).
+  onClick(MediaButton button) {}
+  // Handle a request to skip to the next queue item.
+  onSkipToNext() {}
+  // Handle a request to skip to the previous queue item.
+  onSkipToPrevious() {}
+  // Handle a request to seek to a position.
+  onSeekTo(Duration position) {}
 }

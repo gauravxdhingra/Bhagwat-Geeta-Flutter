@@ -108,9 +108,9 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text("Chapter",
+                Text(language == "hi" ? 'अध्याय' : "Chapter",
                     style: TextStyle(color: Colors.grey, fontSize: 17)),
-                Text("Verse",
+                Text(language == "hi" ? 'श्लोक' : "Verse",
                     style: TextStyle(color: Colors.grey, fontSize: 17)),
               ],
             ),
@@ -126,11 +126,76 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         drawer: Drawer(
           child: Column(
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              AspectRatio(
+                aspectRatio: 16 / 11,
+                child: Stack(
+                  children: [
+                    AspectRatio(
+                        aspectRatio: 16 / 11,
+                        child: Image.asset("assets/images/drawer.png",
+                            fit: BoxFit.cover)),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        width: double.infinity,
+                        // color: Themes.primaryColor,
+                        child: Text("Bhagwat Geeta",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: "Samarkan",
+                                fontSize: 20)),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
+              // ListTile(
+              //   onTap: () {},
+              //   leading: Icon(Icons.home),
+              //   title: Text("Home"),
+              // ),
+              // ListTile(
+              //   onTap: () {},
+              //   leading: Icon(Icons.favorite),
+              //   title: Text("Favourite"),
+              // ),
+              // ListTile(
+              //   onTap: () {},
+              //   leading: Icon(Icons.settings),
+              //   title: Text("Settings"),
+              // ),
+              // ListTile(),
+              ListTile(
+                onTap: () {},
+                leading: Icon(Icons.translate_rounded),
+                title: Text("Change Language"),
+                subtitle: Text("Hindi"),
+              ),
+              ListTile(
+                onTap: () {},
+                leading: Icon(Icons.search),
+                title: Text("Search"),
+              ),
               ListTile(),
-              ListTile(),
-              ListTile(),
-              ListTile(),
+              ListTile(
+                onTap: () {},
+                leading: Icon(Icons.info),
+                title: Text("About Bhagwat Geeta"),
+              ),
+              ListTile(
+                onTap: () {},
+                leading: Icon(Icons.share_rounded),
+                title: Text("Share This App"),
+              ),
+              ListTile(
+                onTap: () {},
+                leading: Icon(Icons.star),
+                title: Text("Rate Us on Google Play"),
+              ),
             ],
           ),
         ),
@@ -216,7 +281,7 @@ class _HomePageState extends State<HomePage> {
               child: Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
-                elevation: 3,
+                elevation: 2,
                 child: InkWell(
                     onTap: () => showPicker(),
                     child: Container(
@@ -225,7 +290,8 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: BorderRadius.circular(10)),
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        child: Text("Go To Verse".toUpperCase(),
+                        child: Text(
+                            language == "hi" ? 'श्लोक चुनें' : "Jump to Verse",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -271,8 +337,8 @@ class _HomePageState extends State<HomePage> {
                     child: Stack(
                       children: [
                         Positioned(
-                            bottom: 0,
-                            right: 0,
+                            bottom: -5,
+                            right: -10,
                             child: Icon(Icons.navigate_next,
                                 color: Colors.white, size: 35)),
                         Column(
@@ -284,6 +350,9 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(height: 10),
                             Text(chapters[chapters.keys.toList()[i]],
                                 style: Themes.homeChapterMeaning.copyWith(
+                                    fontFamily: language == "hi"
+                                        ? 'KrutiDev'
+                                        : "Samarkan",
                                     color: Colors.white.withOpacity(0.75))),
                             SizedBox(height: 10),
                           ],

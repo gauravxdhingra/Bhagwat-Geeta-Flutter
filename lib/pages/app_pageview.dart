@@ -23,6 +23,7 @@ class _AppPageviewState extends State<AppPageview> {
       child: Scaffold(
         body: PageView(
           controller: _controller,
+          physics: NeverScrollableScrollPhysics(),
           children: [
             HomePage(),
             FavouritesPage(),
