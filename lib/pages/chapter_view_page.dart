@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:bhagwat_geeta/pages/homepage.dart';
 import 'package:bhagwat_geeta/pages/play_audio.dart';
 import 'package:blurhash/blurhash.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -32,6 +34,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
   String chapterHeading = "";
   String chapterMeaning = "";
   String chapterDetails = "";
+  int totalVerses;
 
   Scraper provider;
 
@@ -45,6 +48,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
   Box<Map> hive;
   String url = "";
+  var data;
 
   @override
   void didChangeDependencies() async {
@@ -91,6 +95,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       final _random = new Random();
       int next(int min, int max) => min + _random.nextInt(max - min);
       int number = next.call(100, 140);
+      if (number == 115 || number == 133) number = 101;
       imageUrl =
           "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
       print(imageUrl);
@@ -109,21 +114,67 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
         }
       });
 
-// TODO GET AUDIO STREAM
-      // var yt = yte.YoutubeExplode();
-      // var manifest = await yt.videos.streamsClient.getManifest('16yApGx6NEs');
-      // print(manifest.audioOnly.last.url);
-      // yt.close();
+      data = JsonDecoder().convert(PickerData);
+      totalVerses = data[chapterNumber - 1]['$chapterNumber'].length;
+      // print(data[chapterNumber - 1]['$chapterNumber'].length);
 
-      // var video =
-      //     await yt.videos.get('https://www.youtube.com/watch?v=16yApGx6NEs');
-      // print('Title: ${video.title}');
       setState(() {
         _isLoading = false;
         init = true;
       });
     }
     super.didChangeDependencies();
+  }
+
+  showDialogForAudio() async {
+    showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: Text("English"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, PlayAudio.routeName,
+                          arguments: {
+                            "lang": "eng",
+                            "chapterNo": chapterNumber,
+                            "imgUrl": imageUrl,
+                            "blurhash": imageDataBytes,
+                          });
+                    },
+                  ),
+                  ListTile(
+                    title: Text("Hindi"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, PlayAudio.routeName,
+                          arguments: {
+                            "lang": "hi",
+                            "chapterNo": chapterNumber,
+                            "imgUrl": imageUrl,
+                            "blurhash": imageDataBytes,
+                          });
+                    },
+                  ),
+                  ListTile(
+                    title: Text("Sanskrit"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, PlayAudio.routeName,
+                          arguments: {
+                            "lang": "sans",
+                            "chapterNo": chapterNumber,
+                            "imgUrl": imageUrl,
+                            "blurhash": imageDataBytes,
+                          });
+                    },
+                  ),
+                ],
+              ),
+            ));
   }
 
   bool isGettingMore = false;
@@ -173,6 +224,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                             child: Text(_isLoading ? "" : chapterMeaning,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 24,
                                     color: Themes.primaryColor,
                                     fontFamily: 'Samarkan'))),
@@ -181,79 +233,90 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
                             child: Text(_isLoading ? "" : chapterDetails,
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(fontSize: 15))),
+                                softWrap: true,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    wordSpacing: 1.1,
+                                    letterSpacing: 0.5))),
                         SizedBox(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                                onTap: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) => Dialog(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                ListTile(
-                                                  title: Text("English"),
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.pushNamed(context,
-                                                        PlayAudio.routeName,
-                                                        arguments: {
-                                                          "lang": "eng",
-                                                          "chapterNo":
-                                                              chapterNumber,
-                                                        });
-                                                  },
-                                                ),
-                                                ListTile(
-                                                  title: Text("Hindi"),
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.pushNamed(context,
-                                                        PlayAudio.routeName,
-                                                        arguments: {
-                                                          "lang": "hi",
-                                                          "chapterNo":
-                                                              chapterNumber,
-                                                        });
-                                                  },
-                                                ),
-                                                ListTile(
-                                                  title: Text("Sanskrit"),
-                                                  onTap: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.pushNamed(context,
-                                                        PlayAudio.routeName,
-                                                        arguments: {
-                                                          "lang": "sans",
-                                                          "chapterNo":
-                                                              chapterNumber,
-                                                        });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ));
-                                },
-                                child: Text("Play Audio")),
-                            Text("Go To Verse"),
-                          ],
+                        Container(
+                          width: double.infinity,
+                          child: Center(
+                            child: InkWell(
+                                child: Card(
+                                    elevation: 3,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: InkWell(
+                                      onTap: () async {
+                                        await showDialogForAudio();
+                                      },
+                                      child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 30, vertical: 10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Themes.primaryColor),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.play_arrow_rounded,
+                                                  color: Colors.white),
+                                              SizedBox(width: 5),
+                                              Text("Play Audio",
+                                                  style: TextStyle(
+                                                      color: Colors.white)),
+                                              SizedBox(width: 5),
+                                            ],
+                                          )),
+                                    ))),
+                          ),
                         ),
-                        if (!_isLoading)
-                          Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 15, right: 15, top: 0, bottom: 15),
-                              child: Text(_isLoading ? "" : "Verses",
+                        Padding(
+                            padding: const EdgeInsets.only(
+                                left: 15, right: 15, top: 30, bottom: 0),
+                            child: Text(_isLoading ? "" : "Verses",
+                                style: TextStyle(
+                                    fontSize: 30,
+                                    color: Themes.primaryColor,
+                                    fontFamily: 'Samarkan'))),
+                        Container(
+                          height: 100,
+                          child: ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder: (context, i) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: FloatingActionButton(
+                                backgroundColor: Themes.primaryColor,
+                                onPressed: () {
+                                  // print(verses[i]["url"]);
+                                  Navigator.pushNamed(
+                                      context, VerseViewPage.routeName,
+                                      arguments: {
+                                        "verseUrl": verses[0]["url"].replaceAll(
+                                            "verse/1/", "verse/${i + 1}/")
+                                      });
+                                },
+                                heroTag: null,
+                                child: Text(
+                                  '${i + 1}',
                                   style: TextStyle(
-                                      fontSize: 30,
-                                      color: Themes.primaryColor,
-                                      fontFamily: 'Samarkan'))),
-                        if (!_isLoading)
-                          for (int i = 0; i < verses.length; i++)
-                            buildVerseButtons(context, i),
+                                      fontSize: 25, fontFamily: "Samarkan"),
+                                ),
+                              ),
+                            ),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: totalVerses,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        for (int i = 0; i < verses.length; i++)
+                          buildVerseButtons(context, i),
                         SizedBox(height: 20),
                         if (currentPage < pages)
                           SpinKitThreeBounce(
@@ -267,106 +330,15 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                 ],
               ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: _isLoading
-            ? null
-            : Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    (chapterNumber == 1)
-                        ? FloatingActionButton(
-                            heroTag: null,
-                            onPressed: null,
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Icon(Icons.navigate_before,
-                                color: Colors.transparent))
-                        : FloatingActionButton(
-                            heroTag: null,
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, ChapterViewPage.routeName,
-                                  arguments: {
-                                    "chapterNumber": chapterNumber - 1
-                                  });
-                            },
-                            backgroundColor: Themes.primaryColor,
-                            child: Icon(Icons.navigate_before)),
-                    (chapterNumber == 18)
-                        ? FloatingActionButton(
-                            heroTag: null,
-                            onPressed: null,
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Icon(Icons.navigate_before,
-                                color: Colors.transparent))
-                        : FloatingActionButton(
-                            heroTag: null,
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, ChapterViewPage.routeName,
-                                  arguments: {
-                                    "chapterNumber": chapterNumber + 1
-                                  });
-                            },
-                            backgroundColor: Themes.primaryColor,
-                            child: Icon(Icons.navigate_next))
-                  ],
-                ),
-              ),
-      ),
-    );
-  }
-
-  Padding buildVerseButtons(BuildContext context, int i) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, VerseViewPage.routeName,
-              arguments: {"verseUrl": verses[i]["url"]});
-        },
-        child: Container(
-          width: double.infinity,
-          height: 170,
-          padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(10)),
-          child: Stack(
-            children: [
-              Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child:
-                      Icon(Icons.navigate_next, color: Colors.white, size: 35)),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      hive.toMap()["lang"]["lang"] == "eng"
-                          ? verses[i]["verseNo"]
-                          : "श्लोक" + verses[i]["verseNo"].split("Verse")[1],
-                      style: Themes.homeChapterHead),
-                  Text(
-                    verses[i]["verse"],
-                    style: TextStyle(color: Colors.white),
-                    maxLines: 5,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+        floatingActionButton:
+            _isLoading ? null : buildFoatingActionButtons(context),
       ),
     );
   }
 
   SliverAppBar buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height / 3,
+      expandedHeight: MediaQuery.of(context).size.width * 0.85,
       pinned: true,
       centerTitle: true,
       stretch: true,
@@ -396,6 +368,97 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                   fit: BoxFit.cover,
                   width: double.infinity),
             ))),
+      ),
+    );
+  }
+
+  Padding buildVerseButtons(BuildContext context, int i) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, VerseViewPage.routeName,
+                arguments: {"verseUrl": verses[i]["url"]});
+          },
+          child: Container(
+            width: double.infinity,
+            height: 170,
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(15)),
+            child: Stack(
+              children: [
+                Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Icon(Icons.navigate_next,
+                        color: Colors.white, size: 35)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        hive.toMap()["lang"]["lang"] == "eng"
+                            ? verses[i]["verseNo"]
+                            : "श्लोक" + verses[i]["verseNo"].split("Verse")[1],
+                        style: Themes.homeChapterHead),
+                    Text(
+                      verses[i]["verse"],
+                      style: TextStyle(color: Colors.white),
+                      maxLines: 5,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding buildFoatingActionButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          (chapterNumber == 1)
+              ? FloatingActionButton(
+                  heroTag: null,
+                  onPressed: null,
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  child: Icon(Icons.navigate_before, color: Colors.transparent))
+              : FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, ChapterViewPage.routeName,
+                        arguments: {"chapterNumber": chapterNumber - 1});
+                  },
+                  backgroundColor: Themes.primaryColor,
+                  child: Icon(Icons.navigate_before)),
+          (chapterNumber == 18)
+              ? FloatingActionButton(
+                  heroTag: null,
+                  onPressed: null,
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  child: Icon(Icons.navigate_before, color: Colors.transparent))
+              : FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, ChapterViewPage.routeName,
+                        arguments: {"chapterNumber": chapterNumber + 1});
+                  },
+                  backgroundColor: Themes.primaryColor,
+                  child: Icon(Icons.navigate_next))
+        ],
       ),
     );
   }

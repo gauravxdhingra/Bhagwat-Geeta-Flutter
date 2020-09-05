@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:bhagwat_geeta/theme/theme.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_exoplayer/audio_notification.dart';
 // import 'package:flutter_exoplayer/audioplayer.dart';
@@ -23,7 +27,8 @@ class _PlayAudioState extends State<PlayAudio> {
   AudioPlayer audioPlayer;
   var _lowerValue;
   var _upperValue;
-  // Result audio;
+  String imgUrl;
+  Uint8List imageDataBytes;
   AudioPlayer player;
   var x;
   Duration duration;
@@ -33,6 +38,9 @@ class _PlayAudioState extends State<PlayAudio> {
     if (!init) {
       var args = ModalRoute.of(context).settings.arguments as Map;
       lang = args["lang"];
+      imageDataBytes = args["blurhash"];
+      imgUrl = args["imgUrl"];
+
       chapterNo = args["chapterNo"];
       if (lang == "eng") {
         language = "English";
@@ -145,56 +153,109 @@ class _PlayAudioState extends State<PlayAudio> {
         child: Scaffold(
       body: loading
           ? CircularProgressIndicator()
-          : Container(
-              child: Column(
-                children: [
-                  Container(),
-                  Text("Chapter $chapterNo - $language"),
-                  Row(
+          : Stack(
+              children: [
+                Container(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        icon: Icon(Icons.play_arrow),
-                        onPressed: () async {
-                          player.play();
+                      Container(
+                        height: MediaQuery.of(context).size.width,
+                        width: MediaQuery.of(context).size.width,
+                        child: Stack(children: [
+                          CachedNetworkImage(
+                            imageUrl: imgUrl,
+                            fit: BoxFit.cover,
+                            height: MediaQuery.of(context).size.width,
+                            width: MediaQuery.of(context).size.width,
+                            placeholder: (BuildContext context, String url) =>
+                                Image.memory(imageDataBytes,
+                                    fit: BoxFit.cover,
+                                    height: MediaQuery.of(context).size.width,
+                                    width: MediaQuery.of(context).size.width),
+                          ),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text("Bhagwat Geeta",
+                                  style: TextStyle(
+                                      fontFamily: "Samarkan",
+                                      fontSize: 25,
+                                      color: Colors.white)),
+                            ),
+                          )
+                        ]),
+                      ),
+                      Text("Chapter $chapterNo - $language"),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.play_arrow),
+                            onPressed: () async {
+                              player.play();
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.pause),
+                            onPressed: () async {
+                              player.pause();
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.speaker),
+                            onPressed: () async {},
+                          ),
+                        ],
+                      ),
+                      FlutterSlider(
+                        values: [_lowerValue],
+                        max: duration.inSeconds.toDouble(),
+                        min: 0,
+                        onDragCompleted:
+                            (handlerIndex, lowerValue, upperValue) async {
+                          _lowerValue = lowerValue;
+                          _upperValue = upperValue;
+                          print(lowerValue);
+                          print(x);
+                          // print(upperValue);
+                          await player
+                              .seek(Duration(seconds: lowerValue.round()));
+                          setState(() {});
                         },
                       ),
-                      IconButton(
-                        icon: Icon(Icons.pause),
-                        onPressed: () async {
-                          player.pause();
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.speaker),
-                        onPressed: () async {},
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${player.position.inSeconds}'),
+                          Text(player.duration.inSeconds.toString()),
+                        ],
                       ),
                     ],
                   ),
-                  FlutterSlider(
-                    values: [_lowerValue],
-                    max: duration.inSeconds.toDouble(),
-                    min: 0,
-                    onDragCompleted:
-                        (handlerIndex, lowerValue, upperValue) async {
-                      _lowerValue = lowerValue;
-                      _upperValue = upperValue;
-                      print(lowerValue);
-                      print(x);
-                      // print(upperValue);
-                      await player.seek(Duration(seconds: lowerValue.round()));
-                      setState(() {});
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                Positioned(
+                  top: 5,
+                  left: 0,
+                  child: Row(
                     children: [
-                      Text('${player.position.inSeconds}'),
-                      Text(player.duration.inSeconds.toString()),
+                      IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          color: Colors.white,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
+                      SizedBox(width: 10),
+                      Text("Chapter $chapterNo - $language",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500)),
                     ],
                   ),
-                ],
-              ),
+                )
+              ],
             ),
     ));
   }

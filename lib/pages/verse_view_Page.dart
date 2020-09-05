@@ -46,6 +46,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
   Box<Map> hive;
   File image;
   double _progress = 0.0;
+  bool isFav = false;
 
   @override
   void didChangeDependencies() async {
@@ -85,6 +86,8 @@ class _VerseViewPageState extends State<VerseViewPage> {
       blurhashString = x["blurhash"]["$number"];
       imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
 
+      isFav = hive.toMap()["fav"].containsKey(verseUrl);
+      print(hive.toMap()["fav"]);
       print(verse);
       // ImageDownloader.callback(
       //     onProgressUpdate: (String imageId, int progress) {
@@ -143,6 +146,24 @@ class _VerseViewPageState extends State<VerseViewPage> {
           "title": verse["title"],
           "lang": hive.toMap()["lang"]["lang"]
         });
+  }
+
+  addToFav() async {
+    await hive.put("fav", {
+      verseUrl: {"verse": verse}
+    });
+    print(verseUrl);
+    isFav = true;
+    setState(() {});
+  }
+
+  removeFromFav() async {
+    Map temp = hive.get("fav");
+    temp.remove(verseUrl);
+    print(temp);
+    hive.put("fav", temp);
+    isFav = false;
+    setState(() {});
   }
 
   @override
@@ -211,7 +232,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
 
   SliverAppBar buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: MediaQuery.of(context).size.height / 3,
+      expandedHeight: MediaQuery.of(context).size.width * 0.85,
       pinned: true,
       centerTitle: true,
       stretch: true,
@@ -221,8 +242,16 @@ class _VerseViewPageState extends State<VerseViewPage> {
           onPressed: () {},
         ),
         IconButton(
-          icon: Icon(Icons.favorite),
-          onPressed: () {},
+          icon: isFav == null || isFav == false
+              ? Icon(Icons.favorite_border)
+              : Icon(Icons.favorite),
+          onPressed: isFav == null || isFav == false
+              ? () async {
+                  await addToFav();
+                }
+              : () async {
+                  await removeFromFav();
+                },
         ),
         IconButton(
           icon: Icon(FlutterIcons.share_2_fea),
@@ -332,14 +361,21 @@ class _VerseViewPageState extends State<VerseViewPage> {
         width: double.infinity,
         child: Align(
           alignment: Alignment.center,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                borderRadius: BorderRadius.circular(5)),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Text(text,
-                style: TextStyle(
-                    color: Colors.white, fontSize: 22, fontFamily: "Samarkan")),
+          child: Card(
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: Text(text,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontFamily: "Samarkan")),
+            ),
           ),
         ),
       );

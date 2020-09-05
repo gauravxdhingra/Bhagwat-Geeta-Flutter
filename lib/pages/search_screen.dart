@@ -58,51 +58,56 @@ class _SearchScreenState extends State<SearchScreen> {
               for (int i = 0; i < searchResults.length; i++)
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, VerseViewPage.routeName,
-                          arguments: {
-                            "verseUrl":
-                                searchResults.values.elementAt(i)["link"] + "/"
-                          });
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                            width: double.infinity,
-                            height: 170,
-                            padding: EdgeInsets.all(15),
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Text(searchResults.keys.elementAt(i),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: 'Samarkan',
-                                        fontSize: 25)),
-                                SizedBox(height: 10),
-                                Text(
-                                    searchResults.values
-                                        .elementAt(i)["verse"]
-                                        .toString()
-                                        .trim(),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 5,
-                                    softWrap: true,
-                                    style: TextStyle(color: Colors.white))
-                              ],
-                            )),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Icon(Icons.navigate_next,
-                              color: Colors.white, size: 35),
-                        ),
-                      ],
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                  child: Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, VerseViewPage.routeName, arguments: {
+                          "verseUrl":
+                              searchResults.values.elementAt(i)["link"] + "/"
+                        });
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                              width: double.infinity,
+                              height: 170,
+                              padding: EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Text(searchResults.keys.elementAt(i),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Samarkan',
+                                          fontSize: 25)),
+                                  SizedBox(height: 10),
+                                  Text(
+                                      searchResults.values
+                                          .elementAt(i)["verse"]
+                                          .toString()
+                                          .trim(),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 5,
+                                      softWrap: true,
+                                      style: TextStyle(color: Colors.white))
+                                ],
+                              )),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Icon(Icons.navigate_next,
+                                color: Colors.white, size: 35),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() async {
     if (!init) {
+      provider = Provider.of<Scraper>(context);
       await getData();
       setState(() {
         _isLoading = false;
@@ -39,10 +40,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   // "https://bhagavadgita.io/chapter/1/?page=1";
+  var lang;
+
   getData() async {
-    provider = Provider.of<Scraper>(context);
     x = await Hive.openBox<Map>("Geeta");
-    var lang = x.get("lang");
+    lang = x.get("lang");
+    print(lang);
     if (lang == null || lang.toString() == "") {
       x.put("lang", {"lang": "eng"});
     }
@@ -53,6 +56,23 @@ class _HomePageState extends State<HomePage> {
 
     final document = await provider.getWebpage(url);
     chapters = await provider.getChapters(document);
+  }
+
+  changeLanguage() async {
+    setState(() {
+      _isLoading = true;
+    });
+    if (lang["lang"] == "hi") {
+      lang["lang"] = "eng";
+    } else if (lang["lang"] == "eng") {
+      lang["lang"] = "hi";
+    }
+    print(lang);
+    await x.put("lang", {"lang": lang});
+    await getData();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   showPicker() {
@@ -77,13 +97,17 @@ class _HomePageState extends State<HomePage> {
             });
           },
           confirmText: "Go To",
+          confirmTextStyle: TextStyle(color: Themes.primaryColor, fontSize: 20),
+          cancelTextStyle: TextStyle(color: Themes.primaryColor, fontSize: 20),
           footer: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text("Chapter", style: TextStyle()),
-                Text("Verse"),
+                Text("Chapter",
+                    style: TextStyle(color: Colors.grey, fontSize: 17)),
+                Text("Verse",
+                    style: TextStyle(color: Colors.grey, fontSize: 17)),
               ],
             ),
           )).showModal(this.context);
@@ -118,14 +142,16 @@ class _HomePageState extends State<HomePage> {
                 physics: BouncingScrollPhysics(),
                 slivers: [
                   SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.height / 3,
+                    expandedHeight: MediaQuery.of(context).size.width * 0.75,
                     pinned: true,
                     stretch: true,
+                    elevation: 2,
                     actions: [
                       IconButton(
                         icon: Icon(Icons.translate),
-                        onPressed: () {
-                          Navigator.pushNamed(context, SearchScreen.routeName);
+                        onPressed: () async {
+                          // Navigator.pushNamed(context, SearchScreen.routeName);
+                          await changeLanguage();
                         },
                       ),
                       IconButton(
@@ -138,21 +164,28 @@ class _HomePageState extends State<HomePage> {
                     flexibleSpace: FlexibleSpaceBar(
                       titlePadding:
                           EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      centerTitle: false,
+                      centerTitle: true,
                       collapseMode: CollapseMode.parallax,
-                      title: Text(
-                        "Bhagawad Geeta",
-                        style: TextStyle(fontFamily: 'Samarkan', fontSize: 22),
+                      title: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 1),
+                        decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).primaryColor.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(4)),
+                        child: Text("Bhagawad Geeta",
+                            style: TextStyle(
+                                fontFamily: 'Samarkan',
+                                fontSize: 22,
+                                letterSpacing: 1.1,
+                                wordSpacing: 1.2)),
                       ),
                       background: Container(
                         decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                        ),
+                            color: Theme.of(context).scaffoldBackgroundColor),
                         child: Container(
-                          child: Image.asset(
-                            "assets/images/7.jpg",
-                            fit: BoxFit.cover,
-                          ),
+                          child: Image.asset("assets/images/7.jpg",
+                              fit: BoxFit.cover),
                         ),
                       ),
                     ),
@@ -168,71 +201,92 @@ class _HomePageState extends State<HomePage> {
     return SliverList(
       delegate: SliverChildListDelegate(
         [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-            child: InkWell(
-                onTap: () => showPicker(),
-                child: Container(
-                    color: Theme.of(context).primaryColor,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text("Go To Chapter and Verse",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                        textAlign: TextAlign.center))),
+          SizedBox(height: 30),
+          Container(
+            width: double.infinity,
+            child: Center(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 3,
+                child: InkWell(
+                    onTap: () => showPicker(),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        child: Text("Go To Verse".toUpperCase(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                letterSpacing: 1.1)))),
+              ),
+            ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 30),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text("Chapters",
-                style: Themes.homeChapterHead
-                    .copyWith(color: Theme.of(context).primaryColor),
-                textAlign: TextAlign.center),
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: Text(
+              "Chapters",
+              style: Themes.homeChapterHead
+                  .copyWith(color: Theme.of(context).primaryColor),
+              // textAlign: TextAlign.center
+            ),
           ),
           SizedBox(height: 8),
           for (int i = 0; i < chapters.length; i++)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, ChapterViewPage.routeName,
-                      arguments: {
-                        "chapterHead": chapters.keys.toList()[i],
-                        "chapterMeaning": chapters[chapters.keys.toList()[i]],
-                        "chapterNumber": i + 1,
-                      });
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 170,
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Icon(Icons.navigate_next,
-                              color: Colors.white, size: 35)),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('${i + 1}. ' + chapters.keys.toList()[i],
-                              style: Themes.homeChapterHead),
-                          SizedBox(height: 10),
-                          Text(chapters[chapters.keys.toList()[i]],
-                              style: Themes.homeChapterMeaning.copyWith(
-                                  color: Colors.white.withOpacity(0.75))),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                    ],
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
+              child: Card(
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, ChapterViewPage.routeName,
+                        arguments: {
+                          "chapterHead": chapters.keys.toList()[i],
+                          "chapterMeaning": chapters[chapters.keys.toList()[i]],
+                          "chapterNumber": i + 1,
+                        });
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 170,
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Icon(Icons.navigate_next,
+                                color: Colors.white, size: 35)),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('${i + 1}. ' + chapters.keys.toList()[i],
+                                style: Themes.homeChapterHead),
+                            SizedBox(height: 10),
+                            Text(chapters[chapters.keys.toList()[i]],
+                                style: Themes.homeChapterMeaning.copyWith(
+                                    color: Colors.white.withOpacity(0.75))),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          SizedBox(height: 70),
+          SizedBox(height: 20),
         ],
       ),
     );

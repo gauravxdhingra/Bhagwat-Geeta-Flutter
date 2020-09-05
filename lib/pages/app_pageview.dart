@@ -3,6 +3,7 @@ import 'package:bhagwat_geeta/pages/homepage.dart';
 import 'package:bhagwat_geeta/pages/settings_page.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:blur_bottom_bar/blur_bottom_bar.dart';
+import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class AppPageview extends StatefulWidget {
@@ -20,33 +21,37 @@ class _AppPageviewState extends State<AppPageview> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Stack(
+        body: PageView(
+          controller: _controller,
           children: [
-            PageView(
-              controller: _controller,
-              children: [
-                HomePage(),
-                FavouritesPage(),
-                SettingsPage(),
-              ],
+            HomePage(),
+            FavouritesPage(),
+            SettingsPage(),
+          ],
+        ),
+        bottomNavigationBar: CustomNavigationBar(
+          backgroundColor: Themes.primaryColor,
+          onTap: (i) {
+            setState(() {
+              index = i;
+            });
+            _controller.jumpToPage(i);
+          },
+          selectedColor: Colors.white,
+          strokeColor: Colors.white,
+          elevation: 30,
+          scaleFactor: 0.3,
+          unSelectedColor: Colors.white54,
+          currentIndex: index,
+          items: [
+            CustomNavigationBarItem(
+              icon: Icons.home,
             ),
-            BlurBottomView(
-              selectedItemColor: Themes.primaryColor,
-              bottomNavigationBarItems: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.home), title: Text("Home")),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.favorite), title: Text("Favourites")),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings), title: Text("Settings")),
-              ],
-              onIndexChange: (i) {
-                setState(() {
-                  index = i;
-                });
-                _controller.jumpToPage(i);
-              },
-              currentIndex: index,
+            CustomNavigationBarItem(
+              icon: Icons.favorite,
+            ),
+            CustomNavigationBarItem(
+              icon: Icons.settings,
             ),
           ],
         ),
