@@ -41,18 +41,23 @@ class _HomePageState extends State<HomePage> {
 
   // "https://bhagavadgita.io/chapter/1/?page=1";
   var lang;
+  String language = "";
 
   getData() async {
     x = await Hive.openBox<Map>("Geeta");
     lang = x.get("lang");
-    print(lang);
     if (lang == null || lang.toString() == "") {
+      language = "eng";
       x.put("lang", {"lang": "eng"});
     }
-    if (x.toMap()["lang"]["lang"] == "eng")
+    // x = await Hive.openBox<Map>("Geeta");
+    if (x.toMap()["lang"]["lang"] == "eng") {
+      language = "eng";
       url = "https://bhagavadgita.io";
-    else
+    } else {
+      language = "hi";
       url = "https://bhagavadgita.io/hi";
+    }
 
     final document = await provider.getWebpage(url);
     chapters = await provider.getChapters(document);
@@ -62,13 +67,12 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = true;
     });
-    if (lang["lang"] == "hi") {
-      lang["lang"] = "eng";
-    } else if (lang["lang"] == "eng") {
-      lang["lang"] = "hi";
+    if (x.toMap()["lang"]["lang"] == "hi") {
+      x.put("lang", {"lang": "eng"});
+    } else {
+      x.put("lang", {"lang": "hi"});
     }
-    print(lang);
-    await x.put("lang", {"lang": lang});
+
     await getData();
     setState(() {
       _isLoading = false;
@@ -173,9 +177,13 @@ class _HomePageState extends State<HomePage> {
                             color:
                                 Theme.of(context).primaryColor.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(4)),
-                        child: Text("Bhagawad Geeta",
+                        child: Text(
+                            language == "hi"
+                                ? "श्रीमद्भगवद्गीता"
+                                : "Bhagawad Geeta",
                             style: TextStyle(
-                                fontFamily: 'Samarkan',
+                                fontFamily:
+                                    language == "hi" ? 'KrutiDev' : 'Samarkan',
                                 fontSize: 22,
                                 letterSpacing: 1.1,
                                 wordSpacing: 1.2)),

@@ -45,57 +45,23 @@ class _VerseViewPageState extends State<VerseViewPage> {
   int verseNo;
   Box<Map> hive;
   File image;
-  double _progress = 0.0;
+  // double _progress = 0.0;
   bool isFav = false;
+  Scraper provider;
 
   @override
   void didChangeDependencies() async {
     if (!init) {
       final args = ModalRoute.of(context).settings.arguments as Map;
       verseUrl = args["verseUrl"];
-      final provider = Provider.of<Scraper>(context);
+      provider = Provider.of<Scraper>(context);
       data = JsonDecoder().convert(PickerData);
       chapterNo = int.parse(verseUrl.split("/chapter/")[1].split("/")[0]);
       verseNo = int.parse(verseUrl.split("/verse/")[1].split("/")[0]);
-      // print(data[int.parse(verseUrl.split("/chapter/")[1].split("/")[0]) - 1]
-      //         [verseUrl.split("/chapter/")[1].split("/")[0]]
-      //     .length);
       hive = await Hive.openBox<Map>("Geeta");
 
-      String url = "https://bhagavadgita.io" + verseUrl;
-      if (hive.toMap()["lang"]["lang"] == "eng") {
-        url = "https://bhagavadgita.io" + verseUrl;
-        print(url);
-        final document = await provider.getWebpage(url);
-        verse = provider.getFullVerse(document, eng: true);
-      } else {
-        url = "https://bhagavadgita.io" + verseUrl + "hi/";
-        print(url);
-        final document = await provider.getWebpage(url);
-        verse = provider.getFullVerse(document, eng: false);
-      }
-
-      final _random = new Random();
-      int next(int min, int max) => min + _random.nextInt(max - min);
-      int number = next.call(100, 140);
-      if (number == 115 || number == 133) number = 101;
-      imageUrl =
-          "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
-
-      var x = hive.toMap();
-      blurhashString = x["blurhash"]["$number"];
-      imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
-
-      isFav = hive.toMap()["fav"].containsKey(verseUrl);
-      print(hive.toMap()["fav"]);
-      print(verse);
-      // ImageDownloader.callback(
-      //     onProgressUpdate: (String imageId, int progress) {
-      //   setState(() {
-      //     _progress = progress * 0.01;
-      //     print(_progress);
-      //   });
-      // });
+      await getVerse();
+      await getImage();
       setState(() {
         _isLoading = false;
         init = true;
@@ -103,6 +69,66 @@ class _VerseViewPageState extends State<VerseViewPage> {
     }
 
     super.didChangeDependencies();
+  }
+
+  getImage() async {
+    final _random = new Random();
+    int next(int min, int max) => min + _random.nextInt(max - min);
+    int number = next.call(100, 140);
+    if (number == 115 || number == 133) number = 101;
+    imageUrl =
+        "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
+
+    var x = hive.toMap();
+    blurhashString = x["blurhash"]["$number"];
+    imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
+
+    isFav = hive.toMap()["fav"].containsKey(verseUrl);
+    print(hive.toMap()["fav"]);
+    print(verse);
+    // ImageDownloader.callback(
+    //     onProgressUpdate: (String imageId, int progress) {
+    //   setState(() {
+    //     _progress = progress * 0.01;
+    //     print(_progress);
+    //   });
+    // });
+  }
+
+  getVerse() async {
+    String url = "https://bhagavadgita.io" + verseUrl;
+    if (hive.toMap()["lang"]["lang"] == "eng") {
+      url = "https://bhagavadgita.io" + verseUrl;
+      print(url);
+      final document = await provider.getWebpage(url);
+      verse = provider.getFullVerse(document, eng: true);
+    } else {
+      url = "https://bhagavadgita.io" + verseUrl + "hi/";
+      print(url);
+      final document = await provider.getWebpage(url);
+      verse = provider.getFullVerse(document, eng: false);
+    }
+  }
+
+  var x;
+  String language = "";
+  changeLang() async {
+    setState(() {
+      _isLoading = true;
+    });
+    x = await Hive.openBox<Map>("Geeta");
+    if (x.toMap()["lang"]["lang"] == "eng") {
+      x.put("lang", {"lang": "hi"});
+      language = "hi";
+      await getVerse();
+    } else {
+      x.put("lang", {"lang": "eng"});
+      language = "eng";
+      await getVerse();
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   passImage() async {
@@ -239,7 +265,9 @@ class _VerseViewPageState extends State<VerseViewPage> {
       actions: [
         IconButton(
           icon: Icon(Icons.translate),
-          onPressed: () {},
+          onPressed: () async {
+            await changeLang();
+          },
         ),
         IconButton(
           icon: isFav == null || isFav == false

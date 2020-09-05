@@ -65,65 +65,88 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       if (lang == null || lang.toString() == "") {
         hive.put("lang", {"lang": "eng"});
       }
-      var document;
-      url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
 
-      if (hive.toMap()["lang"]["lang"] == "eng") {
-        document = await provider.getWebpage(
-            "https://bhagavadgita.io/chapter/$chapterNumber/?page=" + "1");
-      } else {
-        document = await provider.getWebpage(
-            "https://bhagavadgita.io/chapter/$chapterNumber/hi/?page=" + "1");
-      }
-      // document = await provider.getWebpage(url + "1");
-      pages = provider.getTotalPagesChapter(document);
-      chapterDetails = provider.getChapterDetails(document);
-      chapterHeading = document
-          .getElementsByClassName("hanuman-gradient-text")[0]
-          .getElementsByTagName("h2")[0]
-          .text;
-      if (hive.toMap()["lang"]["lang"] == "hi")
-        chapterHeading = "अध्याय" + chapterHeading.split("Chapter")[1];
-      chapterMeaning = document
-          .getElementsByClassName("hanuman-gradient-text")[0]
-          .getElementsByTagName("h3")[0]
-          .text;
-      verses = provider.getVersesFromPage(document);
-
-      print(chapterHeading);
-
-      final _random = new Random();
-      int next(int min, int max) => min + _random.nextInt(max - min);
-      int number = next.call(100, 140);
-      if (number == 115 || number == 133) number = 101;
-      imageUrl =
-          "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
-      print(imageUrl);
-
-      var x = await Hive.openBox<Map>("Geeta").then((value) => value.toMap());
-      blurhashString = x["blurhash"]["$number"];
-      print(blurhashString);
-
-      imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
-
-      _controller.addListener(() {
-        if (_controller.position.pixels ==
-            _controller.position.maxScrollExtent) {
-          getNextPage(chapterNumber, currentPage + 1, provider);
-          currentPage += 1;
-        }
-      });
-
-      data = JsonDecoder().convert(PickerData);
-      totalVerses = data[chapterNumber - 1]['$chapterNumber'].length;
-      // print(data[chapterNumber - 1]['$chapterNumber'].length);
-
+      await getChapter();
+      await otherInit();
       setState(() {
         _isLoading = false;
         init = true;
       });
     }
     super.didChangeDependencies();
+  }
+
+  getChapter() async {
+    var document;
+    url = "https://bhagavadgita.io/chapter/$chapterNumber/?page=";
+
+    if (hive.toMap()["lang"]["lang"] == "eng") {
+      document = await provider.getWebpage(
+          "https://bhagavadgita.io/chapter/$chapterNumber/?page=" + "1");
+    } else {
+      document = await provider.getWebpage(
+          "https://bhagavadgita.io/chapter/$chapterNumber/hi/?page=" + "1");
+    }
+    // document = await provider.getWebpage(url + "1");
+    pages = provider.getTotalPagesChapter(document);
+    chapterDetails = provider.getChapterDetails(document);
+    chapterHeading = document
+        .getElementsByClassName("hanuman-gradient-text")[0]
+        .getElementsByTagName("h2")[0]
+        .text;
+    if (hive.toMap()["lang"]["lang"] == "hi")
+      chapterHeading = "अध्याय" + chapterHeading.split("Chapter")[1];
+    chapterMeaning = document
+        .getElementsByClassName("hanuman-gradient-text")[0]
+        .getElementsByTagName("h3")[0]
+        .text;
+    verses = provider.getVersesFromPage(document);
+
+    print(chapterHeading);
+  }
+
+  otherInit() async {
+    final _random = new Random();
+    int next(int min, int max) => min + _random.nextInt(max - min);
+    int number = next.call(100, 140);
+    if (number == 115 || number == 133) number = 101;
+    imageUrl =
+        "https://www.bhagavad-gita.us/wp-content/uploads/2012/09/gita-$number.jpg";
+    print(imageUrl);
+
+    var x = await Hive.openBox<Map>("Geeta").then((value) => value.toMap());
+    blurhashString = x["blurhash"]["$number"];
+    print(blurhashString);
+
+    imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
+
+    _controller.addListener(() {
+      if (_controller.position.pixels == _controller.position.maxScrollExtent) {
+        getNextPage(chapterNumber, currentPage + 1, provider);
+        currentPage += 1;
+      }
+    });
+
+    data = JsonDecoder().convert(PickerData);
+    totalVerses = data[chapterNumber - 1]['$chapterNumber'].length;
+    // print(data[chapterNumber - 1]['$chapterNumber'].length);
+  }
+
+  changeLanguage() async {
+    setState(() {
+      _isLoading = true;
+    });
+    if (hive.toMap()["lang"]["lang"] == "hi") {
+      hive.put("lang", {"lang": "eng"});
+    } else {
+      hive.put("lang", {"lang": "hi"});
+    }
+
+    await getChapter();
+    await otherInit();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   showDialogForAudio() async {
@@ -342,6 +365,13 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       pinned: true,
       centerTitle: true,
       stretch: true,
+      actions: [
+        IconButton(
+            icon: Icon(Icons.translate),
+            onPressed: () async {
+              await changeLanguage();
+            })
+      ],
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
         centerTitle: false,

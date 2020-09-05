@@ -87,6 +87,11 @@ flutter:
     - family: Samarkan
       fonts:
         - asset: assets/fonts/Samarkan.ttf
+
+    - family: KrutiDev
+      fonts:
+        - asset: assets/fonts/KrutiDev.ttf
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
