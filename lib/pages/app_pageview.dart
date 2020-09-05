@@ -57,18 +57,10 @@ class _AppPageviewState extends State<AppPageview> {
             unSelectedColor: Colors.white54,
             currentIndex: index,
             items: [
-              CustomNavigationBarItem(
-                icon: Icons.home,
-              ),
-              CustomNavigationBarItem(
-                icon: Icons.favorite,
-              ),
-              CustomNavigationBarItem(
-                icon: Icons.search,
-              ),
-              CustomNavigationBarItem(
-                icon: Icons.settings,
-              ),
+              CustomNavigationBarItem(icon: Icons.home),
+              CustomNavigationBarItem(icon: Icons.favorite),
+              CustomNavigationBarItem(icon: Icons.search),
+              CustomNavigationBarItem(icon: Icons.settings),
             ],
           ),
         ),

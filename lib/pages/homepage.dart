@@ -18,7 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with AutomaticKeepAliveClientMixin {
+// with AutomaticKeepAliveClientMixin
+{
   bool _isLoading = true;
   bool init = false;
 
@@ -121,137 +122,139 @@ class _HomePageState extends State<HomePage>
     showPickerModal(context);
   }
 
+  GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        drawer: Drawer(
-          child: Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 11,
-                child: Stack(
-                  children: [
-                    AspectRatio(
-                        aspectRatio: 16 / 11,
-                        child: Image.asset("assets/images/drawer.png",
-                            fit: BoxFit.cover)),
-                    Align(
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: Drawer(
+        child: Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 11,
+              child: Stack(
+                children: [
+                  AspectRatio(
+                      aspectRatio: 16 / 11,
+                      child: Image.asset("assets/images/drawer.png",
+                          fit: BoxFit.cover)),
+                  Align(
                       alignment: Alignment.bottomCenter,
                       child: Container(
-                        width: double.infinity,
-                        // color: Themes.primaryColor,
-                        child: Text("Bhagwat Geeta",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Samarkan",
-                                fontSize: 20)),
-                      ),
+                          padding: EdgeInsets.only(bottom: 5),
+                          width: double.infinity,
+                          child: Text("Bhagwat Geeta",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Samarkan",
+                                  fontSize: 20))))
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            ListTile(
+              onTap: () async {
+                Navigator.pop(context);
+                await changeLanguage();
+              },
+              leading: Icon(Icons.translate_rounded),
+              title: Text("Change Language"),
+              subtitle: Text(language == "hi" ? "Hindi" : "English"),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, SearchScreen.routeName);
+              },
+              leading: Icon(Icons.search),
+              title: Text("Search"),
+            ),
+            ListTile(),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.info),
+              title: Text("About Bhagwat Geeta"),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.share_rounded),
+              title: Text("Share This App"),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.star),
+              title: Text("Rate Us on Google Play"),
+            ),
+          ],
+        ),
+      ),
+      body: _isLoading
+          ? Center(
+              child: Image.asset(
+                'assets/images/loading.gif',
+                // height: 125.0,
+                width: 125.0,
+              ),
+            )
+          : CustomScrollView(
+              physics: BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: MediaQuery.of(context).size.width * 0.75,
+                  pinned: true,
+                  stretch: false,
+                  // elevation: 0,
+                  actions: [
+                    IconButton(
+                      icon: Icon(Icons.translate),
+                      onPressed: () async {
+                        // Navigator.pushNamed(context, SearchScreen.routeName);
+                        await changeLanguage();
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        Navigator.pushNamed(context, SearchScreen.routeName);
+                      },
                     ),
                   ],
-                ),
-              ),
-              SizedBox(height: 10),
-              ListTile(
-                onTap: () {},
-                leading: Icon(Icons.translate_rounded),
-                title: Text("Change Language"),
-                subtitle: Text("Hindi"),
-              ),
-              ListTile(
-                onTap: () {},
-                leading: Icon(Icons.search),
-                title: Text("Search"),
-              ),
-              ListTile(),
-              ListTile(
-                onTap: () {},
-                leading: Icon(Icons.info),
-                title: Text("About Bhagwat Geeta"),
-              ),
-              ListTile(
-                onTap: () {},
-                leading: Icon(Icons.share_rounded),
-                title: Text("Share This App"),
-              ),
-              ListTile(
-                onTap: () {},
-                leading: Icon(Icons.star),
-                title: Text("Rate Us on Google Play"),
-              ),
-            ],
-          ),
-        ),
-        body: _isLoading
-            ? Center(
-                child: Image.asset(
-                  'assets/images/loading.gif',
-                  // height: 125.0,
-                  width: 125.0,
-                ),
-              )
-            : CustomScrollView(
-                physics: BouncingScrollPhysics(),
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: MediaQuery.of(context).size.width * 0.75,
-                    pinned: true,
-                    stretch: true,
-                    // elevation: 0,
-                    actions: [
-                      IconButton(
-                        icon: Icon(Icons.translate),
-                        onPressed: () async {
-                          // Navigator.pushNamed(context, SearchScreen.routeName);
-                          await changeLanguage();
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.search),
-                        onPressed: () {
-                          Navigator.pushNamed(context, SearchScreen.routeName);
-                        },
-                      ),
-                    ],
-                    flexibleSpace: FlexibleSpaceBar(
-                      titlePadding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      centerTitle: true,
-                      collapseMode: CollapseMode.parallax,
-                      title: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-                        decoration: BoxDecoration(
-                            color:
-                                Theme.of(context).primaryColor.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(4)),
-                        child: Text(
-                            language == "hi"
-                                ? "श्रीमद्भगवद्गीता"
-                                : "Bhagawad Geeta",
-                            style: TextStyle(
-                                fontFamily:
-                                    language == "hi" ? 'KrutiDev' : 'Samarkan',
-                                fontSize: 22,
-                                letterSpacing: 1.1,
-                                wordSpacing: 1.2)),
-                      ),
-                      background: Container(
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor),
-                        child: Container(
-                          child: Image.asset("assets/images/7.jpg",
-                              fit: BoxFit.cover),
-                        ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    titlePadding:
+                        EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    centerTitle: true,
+                    collapseMode: CollapseMode.parallax,
+                    title: Container(
+                      padding: EdgeInsets.symmetric(),
+                      decoration: BoxDecoration(
+                          // color:
+                          //     Theme.of(context).primaryColor.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(4)),
+                      child: Text(
+                          language == "hi"
+                              ? "श्रीमद्भगवद्गीता"
+                              : "Bhagawad Geeta",
+                          style: TextStyle(
+                              fontFamily:
+                                  language == "hi" ? 'KrutiDev' : 'Samarkan',
+                              fontSize: language == "hi" ? 25 : 22,
+                              letterSpacing: 1.1,
+                              wordSpacing: 1.2)),
+                    ),
+                    background: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor),
+                      child: Container(
+                        child: Image.asset("assets/images/7.jpg",
+                            fit: BoxFit.cover),
                       ),
                     ),
                   ),
-                  buildBody(context)
-                ],
-              ),
-      ),
+                ),
+                buildBody(context)
+              ],
+            ),
     );
   }
 
@@ -259,47 +262,81 @@ class _HomePageState extends State<HomePage>
     return SliverList(
       delegate: SliverChildListDelegate(
         [
-          SizedBox(height: 30),
+          SizedBox(height: 40),
           Container(
-            width: double.infinity,
-            child: Center(
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                elevation: 2,
-                child: InkWell(
-                    onTap: () => showPicker(),
-                    child: Container(
-                        decoration: BoxDecoration(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Text(language == "hi" ? "अध्याय" : "Chapters",
+                        style: Themes.homeChapterHead.copyWith(
+                            fontSize: 30,
                             color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(10)),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        child: Text(
-                            language == "hi" ? 'श्लोक चुनें' : "Jump to Verse",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                letterSpacing: 1.1)))),
+                            letterSpacing: 1.1,
+                            fontFamily:
+                                language == "hi" ? "KrutiDev" : "Samarkan"))),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    elevation: 2,
+                    child: InkWell(
+                        onTap: () => showPicker(),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 7, horizontal: 12),
+                            child: Text(
+                                language == "hi"
+                                    ? 'श्लोक चुनें'
+                                    : "Go to Verse",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    letterSpacing: 1.1)))),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 0),
+          Container(
+            height: 100,
+            child: ListView.builder(
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (context, i) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: FloatingActionButton(
+                  backgroundColor: Themes.primaryColor,
+                  onPressed: () {
+                    // print(verses[i]["url"]);
+                    Navigator.pushNamed(context, ChapterViewPage.routeName,
+                        arguments: {
+                          "chapterHead": chapters.keys.toList()[i],
+                          "chapterMeaning": chapters[chapters.keys.toList()[i]],
+                          "chapterNumber": i + 1,
+                        });
+                  },
+                  heroTag: null,
+                  child: Text(
+                    '${i + 1}',
+                    style: TextStyle(fontSize: 25, fontFamily: "Samarkan"),
+                  ),
+                ),
               ),
+              scrollDirection: Axis.horizontal,
+              itemCount: 18,
             ),
           ),
-          SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: Text(
-              language == "hi" ? "अध्याय" : "Chapters",
-              style: Themes.homeChapterHead.copyWith(
-                  color: Theme.of(context).primaryColor,
-                  fontFamily: language == "hi" ? "KrutiDev" : "Samarkan"),
-              // textAlign: TextAlign.center
-            ),
-          ),
-          SizedBox(height: 8),
+          SizedBox(height: 20),
           for (int i = 0; i < chapters.length; i++)
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               child: Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -315,8 +352,8 @@ class _HomePageState extends State<HomePage>
                   },
                   child: Container(
                     width: double.infinity,
-                    height: 170,
-                    padding: EdgeInsets.all(15),
+                    height: 146,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                     decoration: BoxDecoration(
                         color: Theme.of(context).primaryColor,
                         borderRadius: BorderRadius.circular(15)),
@@ -355,8 +392,13 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  @override
-  bool get wantKeepAlive => true;
+  // @override
+  // bool get wantKeepAlive {
+  //   if (language == x.toMap()["lang"]["lang"])
+  //     return true;
+  //   else
+  //     return false;
+  // }
 }
 
 // [1 47, 2 72, 3 43, 4 42, 5 29, 6 47, 7 30, 8 28, 9 34, 10 42, 11 55, 12 20, 13 35, 27, 20, 24, 28, 78]

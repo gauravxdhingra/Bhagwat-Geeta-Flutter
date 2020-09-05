@@ -240,9 +240,10 @@ class _PlayAudioState extends State<PlayAudio> {
                                     color: Themes.primaryColor,
                                     fontSize: 35,
                                     fontFamily: "Samarkan")),
+                            SizedBox(height: 5),
                             Text("$language",
                                 style: TextStyle(
-                                    // color: Themes.primaryColor,
+                                    color: Colors.blueGrey,
                                     fontSize: 25,
                                     fontFamily: "Samarkan")),
                           ],
@@ -398,13 +399,17 @@ class _PlayAudioState extends State<PlayAudio> {
                         IconButton(
                           icon: Icon(Icons.arrow_back_ios),
                           color: Colors.white,
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            player.dispose();
+                            print("disposed");
+                            Navigator.pop(context);
+                          },
                         ),
                         SizedBox(width: 10),
                         Text("Chapter $chapterNo - $language",
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 21,
                                 fontWeight: FontWeight.w500)),
                       ],
                     ),

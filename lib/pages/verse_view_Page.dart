@@ -203,11 +203,12 @@ class _VerseViewPageState extends State<VerseViewPage> {
                 physics: BouncingScrollPhysics(),
                 slivers: [buildSliverAppBar(context), buildSliverBody(context)],
               ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: _isLoading
             ? null
             : Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -262,6 +263,12 @@ class _VerseViewPageState extends State<VerseViewPage> {
       pinned: true,
       centerTitle: true,
       stretch: true,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       actions: [
         IconButton(
           icon: Icon(Icons.translate),

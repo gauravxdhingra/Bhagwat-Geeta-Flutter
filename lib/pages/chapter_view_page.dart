@@ -336,7 +336,6 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                               child: FloatingActionButton(
                                 backgroundColor: Themes.primaryColor,
                                 onPressed: () {
-                                  // print(verses[i]["url"]);
                                   Navigator.pushNamed(
                                       context, VerseViewPage.routeName,
                                       arguments: {
@@ -384,6 +383,12 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
       pinned: true,
       centerTitle: true,
       stretch: true,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back_ios),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
       actions: [
         IconButton(
             icon: Icon(Icons.translate),
@@ -452,6 +457,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                             ? verses[i]["verseNo"]
                             : "श्लोक" + verses[i]["verseNo"].split("Verse")[1],
                         style: Themes.homeChapterHead),
+                    SizedBox(height: 5),
                     Text(
                       verses[i]["verse"],
                       style: TextStyle(
