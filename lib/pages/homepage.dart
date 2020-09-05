@@ -17,7 +17,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   bool _isLoading = true;
   bool init = false;
 
@@ -153,22 +154,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 10),
-              // ListTile(
-              //   onTap: () {},
-              //   leading: Icon(Icons.home),
-              //   title: Text("Home"),
-              // ),
-              // ListTile(
-              //   onTap: () {},
-              //   leading: Icon(Icons.favorite),
-              //   title: Text("Favourite"),
-              // ),
-              // ListTile(
-              //   onTap: () {},
-              //   leading: Icon(Icons.settings),
-              //   title: Text("Settings"),
-              // ),
-              // ListTile(),
               ListTile(
                 onTap: () {},
                 leading: Icon(Icons.translate_rounded),
@@ -214,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                     expandedHeight: MediaQuery.of(context).size.width * 0.75,
                     pinned: true,
                     stretch: true,
-                    elevation: 2,
+                    // elevation: 0,
                     actions: [
                       IconButton(
                         icon: Icon(Icons.translate),
@@ -303,9 +288,10 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Text(
-              "Chapters",
-              style: Themes.homeChapterHead
-                  .copyWith(color: Theme.of(context).primaryColor),
+              language == "hi" ? "अध्याय" : "Chapters",
+              style: Themes.homeChapterHead.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontFamily: language == "hi" ? "KrutiDev" : "Samarkan"),
               // textAlign: TextAlign.center
             ),
           ),
@@ -315,7 +301,7 @@ class _HomePageState extends State<HomePage> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
               child: Card(
-                elevation: 5,
+                elevation: 2,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
                 child: InkWell(
@@ -368,6 +354,9 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 // [1 47, 2 72, 3 43, 4 42, 5 29, 6 47, 7 30, 8 28, 9 34, 10 42, 11 55, 12 20, 13 35, 27, 20, 24, 28, 78]

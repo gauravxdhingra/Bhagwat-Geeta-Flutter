@@ -35,6 +35,8 @@ class _PlayAudioState extends State<PlayAudio> {
   Duration duration;
   Duration position;
   Duration buffPosition;
+  PlayerState playerState;
+  AudioProcessingState playerProcessingState;
   StreamSubscription<AudioProcessingState> _playerStateSubscription;
 
   @override
@@ -65,6 +67,11 @@ class _PlayAudioState extends State<PlayAudio> {
       String streamUrl = manifest.audioOnly.last.url.toString();
       yt.close();
 
+      setState(() {
+        loading = false;
+        init = true;
+      });
+
       player = AudioPlayer();
 
       try {
@@ -78,53 +85,34 @@ class _PlayAudioState extends State<PlayAudio> {
       print(duration);
       player.play();
 
-      // player.playerStateStream.listen((state) {
-      //   if (state.playing) {
-      //   } else {
-      //     switch (state.processingState) {
-      //       case AudioProcessingState.none:
-      //         break;
-      //       case AudioProcessingState.loading:
-      //         break;
-      //       case AudioProcessingState.buffering:
-      //         break;
-      //       case AudioProcessingState.ready:
-      //         break;
-      //       case AudioProcessingState.completed:
-      //         break;
-      //     }
-      //   }
-      // });
       player.positionStream.listen((event) {
         position = event;
+        if (position.inSeconds == duration.inSeconds) player.pause();
         setState(() {});
-        print(event);
       });
 
-      player.bufferedPositionStream.listen((event) {
-        buffPosition = event;
-        setState(() {});
+      player.playerStateStream.listen((event) {
+        playerState = event;
         print(event);
+        setState(() {});
       });
-// See also:
-// - durationStream
-// - positionStream
-// - bufferedPositionStream
-// - sequenceStateStream
-// - sequenceStream
-// - currentIndexStream
-// - icyMetadataStream
-// - playingStream
-// - processingStateStream
-// - loopModeStream
-// - shuffleModeEnabledStream
-// - volumeStream
-// - speedStream
-// - playbackEventStream
-      setState(() {
-        loading = false;
-        init = true;
+
+      player.processingStateStream.listen((event) {
+        // playerProcessingState = event;
+        print(event);
+        setState(() {});
       });
+
+      // await AudioServiceBackground.setState(
+      //   playing: true,
+      //   controls: [],
+      //   processingState: AudioProcessingState.completed,
+      // );
+      // await AudioServiceBackground.setMediaItem(MediaItem(
+      //   title: "Hey Jude",
+      //   album: "Bhagwat Geeta",
+      //   id: "ABC",
+      // ));
     }
     super.didChangeDependencies();
   }
@@ -197,162 +185,248 @@ class _PlayAudioState extends State<PlayAudio> {
   Widget build(BuildContext context) {
     // print(player.position.inSeconds.toString());
     // print(player.position.inMilliseconds);
-    return SafeArea(
-        child: Scaffold(
-      body: loading
-          ? Center(
-              child: Image.asset('assets/images/loading.gif',
-                  height: 125.0, width: 125.0))
-          : Stack(
-              children: [
-                Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        height: MediaQuery.of(context).size.width,
-                        width: MediaQuery.of(context).size.width,
-                        child: Stack(children: [
-                          CachedNetworkImage(
-                            imageUrl: imgUrl,
-                            fit: BoxFit.cover,
-                            height: MediaQuery.of(context).size.width,
-                            width: MediaQuery.of(context).size.width,
-                            placeholder: (BuildContext context, String url) =>
-                                Image.memory(imageDataBytes,
-                                    fit: BoxFit.cover,
-                                    height: MediaQuery.of(context).size.width,
-                                    width: MediaQuery.of(context).size.width),
-                          ),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Text("Bhagwat Geeta",
-                                  style: TextStyle(
-                                      fontFamily: "Samarkan",
-                                      fontSize: 25,
-                                      color: Colors.white)),
+    return WillPopScope(
+      onWillPop: () async {
+        player.dispose();
+        print("disposed");
+        Navigator.pop(context);
+        return true;
+      },
+      child: SafeArea(
+          child: Scaffold(
+        body: loading
+            ? Center(
+                child: Image.asset('assets/images/loading.gif',
+                    height: 125.0, width: 125.0))
+            : Stack(
+                children: [
+                  Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.width,
+                          width: MediaQuery.of(context).size.width,
+                          child: Stack(children: [
+                            CachedNetworkImage(
+                              imageUrl: imgUrl,
+                              fit: BoxFit.cover,
+                              height: MediaQuery.of(context).size.width,
+                              width: MediaQuery.of(context).size.width,
+                              placeholder: (BuildContext context, String url) =>
+                                  Image.memory(imageDataBytes,
+                                      fit: BoxFit.cover,
+                                      height: MediaQuery.of(context).size.width,
+                                      width: MediaQuery.of(context).size.width),
                             ),
-                          )
-                        ]),
-                      ),
-                      Text("Chapter $chapterNo"),
-                      Text("$language"),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.play_arrow),
-                            onPressed: () async {
-                              player.play();
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.pause),
-                            onPressed: () async {
-                              player.pause();
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.speaker),
-                            onPressed: () async {},
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: FlutterSlider(
-                              values: [
-                                // _lowerValue
-                                position.inSeconds.roundToDouble()
-                              ],
-                              max: duration.inSeconds.toDouble(),
-                              min: 0,
-                              trackBar: FlutterSliderTrackBar(
-                                  activeTrackBar: BoxDecoration(
-                                      color: Themes.primaryColor)),
-                              tooltip: FlutterSliderTooltip(
-                                  textStyle: TextStyle(
-                                      fontSize: 0.01, color: Colors.white),
-                                  boxStyle: FlutterSliderTooltipBox(
-                                      decoration: BoxDecoration(
-                                          color: Colors.transparent))),
-                              handlerAnimation: FlutterSliderHandlerAnimation(
-                                  curve: Curves.elasticOut,
-                                  reverseCurve: Curves.bounceIn,
-                                  duration: Duration(milliseconds: 500),
-                                  scale: 1.5),
-                              handler: FlutterSliderHandler(
-                                  decoration:
-                                      BoxDecoration(shape: BoxShape.circle),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(3),
-                                    child: Material(
-                                        type: MaterialType.canvas,
-                                        elevation: 3,
-                                        shape: CircleBorder(),
-                                        child: Container()),
-                                  )),
-                              onDragCompleted:
-                                  (handlerIndex, lowerValue, upperValue) async {
-                                _lowerValue = lowerValue;
-                                _upperValue = upperValue;
-                                print(lowerValue);
-                                print(x);
-                                await player.seek(
-                                    Duration(seconds: lowerValue.round()));
-                                setState(() {});
-                              },
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Text("Bhagwat Geeta",
+                                    style: TextStyle(
+                                        fontFamily: "Samarkan",
+                                        fontSize: 25,
+                                        color: Colors.white)),
+                              ),
+                            )
+                          ]),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text("Chapter $chapterNo",
+                                style: TextStyle(
+                                    color: Themes.primaryColor,
+                                    fontSize: 35,
+                                    fontFamily: "Samarkan")),
+                            Text("$language",
+                                style: TextStyle(
+                                    // color: Themes.primaryColor,
+                                    fontSize: 25,
+                                    fontFamily: "Samarkan")),
+                          ],
+                        ),
+                        InkWell(
+                          onTap: playerState != null
+                              ? playerState.playing
+                                  ? () async {
+                                      player.pause();
+                                    }
+                                  : () async {
+                                      player.play();
+                                    }
+                              : null,
+                          customBorder: CircleBorder(),
+                          child: AnimatedContainer(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: playerState != null
+                                    ? playerState.playing
+                                        ? Themes.primaryColor
+                                        : Colors.blueGrey
+                                    : Colors.grey),
+                            duration: Duration(milliseconds: 500),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 40,
+                              child: playerState != null
+                                  ? playerState.processingState ==
+                                          ProcessingState.buffering
+                                      ? CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white))
+                                      : playerState.playing
+                                          ? Icon(Icons.pause,
+                                              size: 50, color: Colors.white)
+                                          : Icon(Icons.play_arrow,
+                                              size: 50, color: Colors.white)
+                                  : CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white)),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(position
-                                    .toString()
-                                    .split(".")[0]
-                                    .replaceAll(":", " : ")),
-                                Text(duration
-                                    .toString()
-                                    .split(".")[0]
-                                    .replaceAll(":", " : ")),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: FlutterSlider(
+                                    disabled: playerState == null ||
+                                            playerState.processingState ==
+                                                ProcessingState.none ||
+                                            playerState.processingState ==
+                                                ProcessingState.loading
+                                        ? true
+                                        : false,
+                                    values: [
+                                      // _lowerValue
+                                      playerState == null
+                                          ? 0.0
+                                          : position.inSeconds.roundToDouble()
+                                    ],
+                                    max: playerState == null
+                                        ? 1.0
+                                        : duration.inSeconds.toDouble(),
+                                    min: 0,
+                                    trackBar: FlutterSliderTrackBar(
+                                        activeTrackBar: BoxDecoration(
+                                            color: Themes.primaryColor)),
+                                    tooltip: FlutterSliderTooltip(
+                                        textStyle: TextStyle(
+                                            fontSize: 0.01,
+                                            color: Colors.white),
+                                        boxStyle: FlutterSliderTooltipBox(
+                                            decoration: BoxDecoration(
+                                                color: Colors.transparent))),
+                                    handlerAnimation:
+                                        FlutterSliderHandlerAnimation(
+                                            curve: Curves.elasticOut,
+                                            reverseCurve: Curves.bounceIn,
+                                            duration:
+                                                Duration(milliseconds: 500),
+                                            scale: 1.5),
+                                    handler: FlutterSliderHandler(
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle),
+                                        child: Padding(
+                                            padding: EdgeInsets.all(3),
+                                            child: Material(
+                                                type: MaterialType.canvas,
+                                                elevation: 2,
+                                                shape: CircleBorder(),
+                                                child: Container()))),
+                                    onDragCompleted: (handlerIndex, lowerValue,
+                                        upperValue) async {
+                                      _lowerValue = lowerValue;
+                                      _upperValue = upperValue;
+                                      print(lowerValue);
+                                      print(x);
+                                      await player.seek(Duration(
+                                          seconds: lowerValue.round()));
+                                      setState(() {});
+                                    },
+                                    onDragging: (handlerIndex, lowerValue,
+                                        upperValue) async {
+                                      _lowerValue = lowerValue;
+                                      _upperValue = upperValue;
+                                      print(lowerValue);
+                                      print(x);
+                                      await player.seek(Duration(
+                                          seconds: lowerValue.round()));
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(position
+                                          .toString()
+                                          .split(".")[0]
+                                          .replaceAll(":", " : ")),
+                                      Text(duration
+                                          .toString()
+                                          .split(".")[0]
+                                          .replaceAll(":", " : ")),
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox()
-                    ],
+                          ],
+                        ),
+                        SizedBox(),
+                      ],
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: 5,
-                  left: 0,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
-                        color: Colors.white,
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                      SizedBox(width: 10),
-                      Text("Chapter $chapterNo - $language",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500)),
-                    ],
-                  ),
-                )
-              ],
-            ),
-    ));
+                  Positioned(
+                    top: 5,
+                    left: 0,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          color: Colors.white,
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        SizedBox(width: 10),
+                        Text("Chapter $chapterNo - $language",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+      )),
+    );
   }
+}
+
+class MyBackgroundTask extends BackgroundAudioTask {
+  // Initialise your audio task.
+  onStart(Map<String, dynamic> params) {}
+  // Handle a request to stop audio and finish the task.
+  onStop() async {}
+  // Handle a request to play audio.
+  onPlay() {}
+  // Handle a request to pause audio.
+  onPause() {}
+  // Handle a headset button click (play/pause, skip next/prev).
+  onClick(MediaButton button) {}
+  // Handle a request to seek to a position.
+  onSeekTo(Duration position) {}
 }

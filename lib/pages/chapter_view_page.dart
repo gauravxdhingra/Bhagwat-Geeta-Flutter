@@ -281,7 +281,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                           child: Center(
                             child: InkWell(
                                 child: Card(
-                                    elevation: 3,
+                                    elevation: 1,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(10)),
@@ -423,7 +423,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 7.5),
       child: Card(
-        elevation: 5,
+        elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: InkWell(
           onTap: () {
