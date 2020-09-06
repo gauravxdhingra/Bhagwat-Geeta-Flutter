@@ -91,7 +91,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => Scraper(),
       child: MaterialApp(
-        title: 'Bhagwat Geeta',
+        title: 'Shreemad Bhagwat Geeta',
         theme: ThemeData(
           primaryColor: Color(0xffff5521),
           visualDensity: VisualDensity.adaptivePlatformDensity,

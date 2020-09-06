@@ -57,12 +57,27 @@ dependencies:
   intl: ^0.16.1
   audio_service: ^0.14.1
   url_launcher: ^5.5.2
+  rename: ^1.2.0
+  flutter_rename_app: ^1.0.0
 
 dev_dependencies:
   hive_generator: ^0.7.1
+  flutter_launcher_icons: "^0.7.5"
   # build_runner: ^1.10.2
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"    
+
+flutter_rename_app:
+  application_name: Shreemad Bhagwat Geeta
+  # dart_package_name: bhagwat_geeta
+  application_id: com.gauravxdhingra.shreemadbhagwatgeeta
+  # bundle_id: com.gauravxdhingra.shreemadbhagwatgeeta
+  # android_package_name: com.gauravxdhingra.shreemadbhagwatgeeta
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -75,7 +90,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/GeetaImages/
+    # - assets/images/GeetaImages/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

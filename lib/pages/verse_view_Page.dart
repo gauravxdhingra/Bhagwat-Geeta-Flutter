@@ -48,6 +48,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
   // double _progress = 0.0;
   bool isFav = false;
   Scraper provider;
+  int totalVerses = 1;
 
   @override
   void didChangeDependencies() async {
@@ -59,6 +60,9 @@ class _VerseViewPageState extends State<VerseViewPage> {
       chapterNo = int.parse(verseUrl.split("/chapter/")[1].split("/")[0]);
       verseNo = int.parse(verseUrl.split("/verse/")[1].split("/")[0]);
       hive = await Hive.openBox<Map>("Geeta");
+
+      // data = JsonDecoder().convert(PickerData);
+      totalVerses = data[chapterNo - 1]['$chapterNo'].length;
 
       await getVerse();
       await getImage();
@@ -218,17 +222,41 @@ class _VerseViewPageState extends State<VerseViewPage> {
           body: _isLoading
               ? Center(
                   child: Image.asset('assets/images/loading.gif', width: 125.0))
-              : CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
-                  buildSliverAppBar(context),
-                  buildSliverBody(context)
-                ]),
+              : Stack(
+                  children: [
+                    CustomScrollView(
+                        physics: BouncingScrollPhysics(),
+                        slivers: [
+                          buildSliverAppBar(context),
+                          buildSliverBody(context),
+                        ]),
+                    // Container(
+                    //   color: Colors.red,
+                    //   height: 5,
+                    //   width: MediaQuery.of(context).size.width *
+                    //       verseNo /
+                    //       totalVerses,
+                    //   child: ColoredBox(color: Colors.white),
+                    // ),
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                          color: Colors.red,
+                          height: 7,
+                          width: MediaQuery.of(context).size.width *
+                              verseNo /
+                              totalVerses,
+                          child: ColoredBox(color: Themes.primaryColor)),
+                    ),
+                  ],
+                ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           floatingActionButton: _isLoading
               ? null
               : Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[

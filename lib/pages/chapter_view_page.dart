@@ -239,134 +239,150 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                   width: 125.0,
                 ),
               )
-            : CustomScrollView(
-                controller: _controller,
-                physics: BouncingScrollPhysics(),
-                slivers: [
-                  buildSliverAppBar(context),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15, right: 15, top: 30, bottom: 0),
-                            child: Text(_isLoading ? "" : chapterMeaning,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 24,
-                                    color: Themes.primaryColor,
-                                    fontFamily:
-                                        // language == "hi"
-                                        //     ?
-                                        // "KrutiDev"
-                                        // :
-                                        'Samarkan'))),
-                        Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 10),
-                            child: Text(_isLoading ? "" : chapterDetails,
-                                softWrap: true,
-                                style: TextStyle(
-                                    fontFamily: language == "hi"
-                                        ? "KrutiDev"
-                                        : 'Roboto',
-                                    fontSize: 15,
-                                    wordSpacing: 1.04,
-                                    letterSpacing: 0.5))),
-                        SizedBox(height: 30),
-                        Container(
-                          width: double.infinity,
-                          child: Center(
-                            child: InkWell(
-                                child: Card(
-                                    elevation: 3,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: InkWell(
-                                      onTap: () async {
-                                        await showDialogForAudio();
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 30, vertical: 10),
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Themes.primaryColor),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(Icons.play_arrow_rounded,
-                                                  color: Colors.white),
-                                              SizedBox(width: 5),
-                                              Text(
-                                                  language == "hi"
-                                                      ? "ऑडियो चलाएं"
-                                                      : "Play Audio",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 18)),
-                                              SizedBox(width: 5),
-                                            ],
-                                          )),
-                                    ))),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Padding(
-                            padding: const EdgeInsets.only(
-                                left: 15, right: 15, top: 30, bottom: 0),
-                            child: Text(language == "hi" ? "श्लोक" : "Verses",
-                                style: TextStyle(
-                                    fontSize: 30,
-                                    color: Themes.primaryColor,
-                                    fontFamily: 'Samarkan'))),
-                        Container(
-                          height: 100,
-                          child: ListView.builder(
-                            physics: BouncingScrollPhysics(),
-                            itemBuilder: (context, i) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              child: FloatingActionButton(
-                                backgroundColor: Themes.primaryColor,
-                                onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, VerseViewPage.routeName,
-                                      arguments: {
+            : Stack(
+                children: [
+                  CustomScrollView(
+                    controller: _controller,
+                    physics: BouncingScrollPhysics(),
+                    slivers: [
+                      buildSliverAppBar(context),
+                      SliverList(
+                        delegate: SliverChildListDelegate(
+                          [
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, top: 30, bottom: 0),
+                                child: Text(_isLoading ? "" : chapterMeaning,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 24,
+                                        color: Themes.primaryColor,
+                                        fontFamily:
+                                            // language == "hi"
+                                            //     ?
+                                            // "KrutiDev"
+                                            // :
+                                            'Samarkan'))),
+                            Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                                child: Text(_isLoading ? "" : chapterDetails,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                        fontFamily: language == "hi"
+                                            ? "KrutiDev"
+                                            : 'Roboto',
+                                        fontSize: 15,
+                                        wordSpacing: 1.04,
+                                        letterSpacing: 0.5))),
+                            SizedBox(height: 30),
+                            Container(
+                              width: double.infinity,
+                              child: Center(
+                                child: InkWell(
+                                    child: Card(
+                                        elevation: 3,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: InkWell(
+                                          onTap: () async {
+                                            await showDialogForAudio();
+                                          },
+                                          child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 30, vertical: 10),
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: Themes.primaryColor),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.play_arrow_rounded,
+                                                      color: Colors.white),
+                                                  SizedBox(width: 5),
+                                                  Text(
+                                                      language == "hi"
+                                                          ? "ऑडियो चलाएं"
+                                                          : "Play Audio",
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 18)),
+                                                  SizedBox(width: 5),
+                                                ],
+                                              )),
+                                        ))),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 15, right: 15, top: 30, bottom: 0),
+                                child: Text(
+                                    language == "hi" ? "श्लोक" : "Verses",
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        color: Themes.primaryColor,
+                                        fontFamily: 'Samarkan'))),
+                            Container(
+                              height: 100,
+                              child: ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                itemBuilder: (context, i) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
+                                  child: FloatingActionButton(
+                                    backgroundColor: Themes.primaryColor,
+                                    onPressed: () {
+                                      Navigator.pushNamed(context,
+                                          VerseViewPage.routeName, arguments: {
                                         "verseUrl": verses[0]["url"].replaceAll(
                                             "verse/1/", "verse/${i + 1}/")
                                       });
-                                },
-                                heroTag: null,
-                                child: Text(
-                                  '${i + 1}',
-                                  style: TextStyle(
-                                      fontSize: 25, fontFamily: "Samarkan"),
+                                    },
+                                    heroTag: null,
+                                    child: Text(
+                                      '${i + 1}',
+                                      style: TextStyle(
+                                          fontSize: 25, fontFamily: "Samarkan"),
+                                    ),
+                                  ),
                                 ),
+                                scrollDirection: Axis.horizontal,
+                                itemCount: totalVerses,
                               ),
                             ),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: totalVerses,
-                          ),
+                            SizedBox(height: 10),
+                            for (int i = 0; i < verses.length; i++)
+                              buildVerseButtons(context, i),
+                            SizedBox(height: 20),
+                            if (currentPage < pages)
+                              SpinKitThreeBounce(
+                                color: Theme.of(context).primaryColor,
+                                size: 25,
+                              ),
+                            if (currentPage < pages) SizedBox(height: 20),
+                            SizedBox(height: 30),
+                          ],
                         ),
-                        SizedBox(height: 10),
-                        for (int i = 0; i < verses.length; i++)
-                          buildVerseButtons(context, i),
-                        SizedBox(height: 20),
-                        if (currentPage < pages)
-                          SpinKitThreeBounce(
-                            color: Theme.of(context).primaryColor,
-                            size: 25,
-                          ),
-                        if (currentPage < pages) SizedBox(height: 20),
-                        SizedBox(height: 30),
-                      ],
+                      ),
+                    ],
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width *
+                          chapterNumber /
+                          18,
+                      height: 7,
+                      child: ColoredBox(
+                        color: Themes.primaryColor,
+                      ),
                     ),
                   ),
                 ],
@@ -479,7 +495,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
 
   Padding buildFoatingActionButtons(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
