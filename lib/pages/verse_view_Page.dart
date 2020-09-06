@@ -82,10 +82,11 @@ class _VerseViewPageState extends State<VerseViewPage> {
     var x = hive.toMap();
     blurhashString = x["blurhash"]["$number"];
     imageDataBytes = await BlurHash.decode(blurhashString, 32, 32);
-
-    isFav = hive.toMap()["fav"].containsKey(verseUrl);
-    print(hive.toMap()["fav"]);
-    print(verse);
+    hive.toMap()["fav"] != null
+        ? isFav = hive.toMap()["fav"].containsKey(verseUrl)
+        : isFav = false;
+    // print(hive.toMap()["fav"]);
+    // print(verse);
     // ImageDownloader.callback(
     //     onProgressUpdate: (String imageId, int progress) {
     //   setState(() {
@@ -174,21 +175,32 @@ class _VerseViewPageState extends State<VerseViewPage> {
         });
   }
 
-  addToFav() async {
-    await hive.put("fav", {
-      verseUrl: {"verse": verse}
-    });
-    print(verseUrl);
-    isFav = true;
-    setState(() {});
-  }
+  // addToFav() async {
+  //   List favs = hive.get("fav");
+  //   // print("1");
+  //   favs.add(verse);
+  //   // print("2");
+  //   // print(favs);
+  //   await hive.delete("fav");
+  //   await hive.put("fav", favs["fav"]);
+  //   print(hive.get("favs"));
+  //   print("3");
+  //   print(verseUrl);
+  //   print("4");
+  //   isFav = true;
+  //   // print(hive.get("fav").length);
+  //   setState(() {});
+  // }
 
   removeFromFav() async {
-    Map temp = hive.get("fav");
-    temp.remove(verseUrl);
-    print(temp);
-    hive.put("fav", temp);
+    Map temp = {"fav": hive.get("fav")};
+
+    temp["fav"].remove(verseUrl);
+
+    hive.put("fav", temp["fav"]);
+    print(temp["fav"]);
     isFav = false;
+    print(hive.get("fav"));
     setState(() {});
   }
 
@@ -282,7 +294,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
               : Icon(Icons.favorite),
           onPressed: isFav == null || isFav == false
               ? () async {
-                  await addToFav();
+                  // await addToFav();
                 }
               : () async {
                   await removeFromFav();

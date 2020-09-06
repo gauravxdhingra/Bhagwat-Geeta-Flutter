@@ -39,12 +39,12 @@ class _AppPageviewState extends State<AppPageview> {
             // borderRadius: Radius.circular(22),
             backgroundColor: Themes.primaryColor,
             onTap: (i) {
-              if (i == 2) {
+              if (i == 1) {
                 Navigator.pushNamed(context, SearchScreen.routeName);
                 return;
               }
               setState(() {
-                i == 0 || i == 1
+                i == 0
                     ? _controller.jumpToPage(i)
                     : _controller.jumpToPage(i - 1);
                 index = i;
@@ -58,8 +58,8 @@ class _AppPageviewState extends State<AppPageview> {
             currentIndex: index,
             items: [
               CustomNavigationBarItem(icon: Icons.home),
-              CustomNavigationBarItem(icon: Icons.favorite),
               CustomNavigationBarItem(icon: Icons.search),
+              CustomNavigationBarItem(icon: Icons.favorite),
               CustomNavigationBarItem(icon: Icons.settings),
             ],
           ),

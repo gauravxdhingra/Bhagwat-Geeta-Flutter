@@ -41,7 +41,6 @@ class _HomePageState extends State<HomePage>
     super.didChangeDependencies();
   }
 
-  // "https://bhagavadgita.io/chapter/1/?page=1";
   var lang;
   String language = "";
 
@@ -52,7 +51,6 @@ class _HomePageState extends State<HomePage>
       language = "eng";
       x.put("lang", {"lang": "eng"});
     }
-    // x = await Hive.openBox<Map>("Geeta");
     if (x.toMap()["lang"]["lang"] == "eng") {
       language = "eng";
       url = "https://bhagavadgita.io";
@@ -60,7 +58,6 @@ class _HomePageState extends State<HomePage>
       language = "hi";
       url = "https://bhagavadgita.io/hi";
     }
-
     final document = await provider.getWebpage(url);
     chapters = await provider.getChapters(document);
   }
@@ -69,11 +66,10 @@ class _HomePageState extends State<HomePage>
     setState(() {
       _isLoading = true;
     });
-    if (x.toMap()["lang"]["lang"] == "hi") {
+    if (x.toMap()["lang"]["lang"] == "hi")
       x.put("lang", {"lang": "eng"});
-    } else {
+    else
       x.put("lang", {"lang": "hi"});
-    }
 
     await getData();
     setState(() {
@@ -221,9 +217,9 @@ class _HomePageState extends State<HomePage>
                     ),
                   ],
                   flexibleSpace: FlexibleSpaceBar(
-                    titlePadding:
-                        EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    centerTitle: true,
+                    // titlePadding:
+                    //     EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    // centerTitle: true,
                     collapseMode: CollapseMode.parallax,
                     title: Container(
                       padding: EdgeInsets.symmetric(),
@@ -238,8 +234,8 @@ class _HomePageState extends State<HomePage>
                           style: TextStyle(
                               fontFamily:
                                   language == "hi" ? 'KrutiDev' : 'Samarkan',
-                              fontSize: language == "hi" ? 25 : 22,
-                              letterSpacing: 1.1,
+                              // fontSize: language == "hi" ? 22 : 20,
+                              // letterSpacing: 1.1,
                               wordSpacing: 1.2)),
                     ),
                     background: Container(

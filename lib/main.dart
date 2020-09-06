@@ -32,6 +32,7 @@ void main() async {
         .then((value) => value.setBool("init", true))
         .then((value) async {
       var x = await Hive.openBox<Map>("Geeta");
+      // await x.clear();
 
       Map blurhash = {
         "100": "LeI}LV~nE3IB?a%MRkoHNaafRkkC",
