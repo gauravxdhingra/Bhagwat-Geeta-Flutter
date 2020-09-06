@@ -281,7 +281,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                           child: Center(
                             child: InkWell(
                                 child: Card(
-                                    elevation: 1,
+                                    elevation: 3,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
                                             BorderRadius.circular(10)),
@@ -365,6 +365,7 @@ class _ChapterViewPageState extends State<ChapterViewPage> {
                             size: 25,
                           ),
                         if (currentPage < pages) SizedBox(height: 20),
+                        SizedBox(height: 30),
                       ],
                     ),
                   ),

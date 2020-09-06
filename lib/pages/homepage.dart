@@ -8,9 +8,11 @@ import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
 import 'package:bhagwat_geeta/provider/scraper.dart';
 import 'package:bhagwat_geeta/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -205,6 +207,15 @@ class _HomePageState extends State<HomePage>
             ),
             ListTile(
               onTap: () {
+                Navigator.pop(context);
+                showPicker();
+              },
+              leading: Icon(FlutterIcons.quote_left_faw),
+              title: Text("Go To Verse"),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
                 Navigator.pushNamed(context, SearchScreen.routeName);
               },
               leading: Icon(Icons.search),
@@ -220,14 +231,19 @@ class _HomePageState extends State<HomePage>
               title: Text("About Bhagwat Geeta"),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () async {
+                Navigator.pop(context);
+                await Share.share(
+                    "Check out this amazing app - Shrimad Bhagwat Geeta\n${Themes.appUrl}\n\nJai Shree Krishna🙏🏻");
+              },
               leading: Icon(Icons.share_rounded),
               title: Text("Share App"),
             ),
             ListTile(
               onTap: () async {
+                Navigator.pop(context);
                 _launchURL() async {
-                  const url = 'https://flutter.dev';
+                  const url = Themes.appUrl;
                   if (await canLaunch(url)) {
                     await launch(url);
                   } else {
@@ -252,6 +268,13 @@ class _HomePageState extends State<HomePage>
                 SliverAppBar(
                     expandedHeight: MediaQuery.of(context).size.width * 0.75,
                     pinned: true,
+                    title: Text(
+                        language == "hi"
+                            ? "श्रीमद्भगवद्गीता"
+                            : "Bhagawad Geeta",
+                        style: TextStyle(
+                            fontFamily:
+                                language == "hi" ? 'KrutiDev' : 'Samarkan')),
                     stretch: false,
                     actions: [
                       IconButton(
@@ -269,17 +292,18 @@ class _HomePageState extends State<HomePage>
                     flexibleSpace: FlexibleSpaceBar(
                         collapseMode: CollapseMode.parallax,
                         title: Container(
-                            padding: EdgeInsets.symmetric(),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4)),
-                            child: Text(
-                                language == "hi"
-                                    ? "श्रीमद्भगवद्गीता"
-                                    : "Bhagawad Geeta",
-                                style: TextStyle(
-                                    fontFamily: language == "hi"
-                                        ? 'KrutiDev'
-                                        : 'Samarkan'))),
+                          padding: EdgeInsets.symmetric(),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4)),
+                          // child: Text(
+                          //     language == "hi"
+                          //         ? "श्रीमद्भगवद्गीता"
+                          //         : "Bhagawad Geeta",
+                          //     style: TextStyle(
+                          //         fontFamily: language == "hi"
+                          //             ? 'KrutiDev'
+                          //             : 'Samarkan'))
+                        ),
                         background: Container(
                           decoration: BoxDecoration(
                               color: Theme.of(context).scaffoldBackgroundColor),
@@ -353,6 +377,40 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
             ),
+          SizedBox(height: 15),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            child: Center(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                elevation: 3,
+                child: InkWell(
+                    onTap: () => showPicker(),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FlutterIcons.quote_left_faw,
+                                color: Colors.white.withOpacity(0.6)),
+                            Text(
+                                language == "hi"
+                                    ? ' श्लोक चुनें'
+                                    : " Jump to Verse",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    letterSpacing: 1.1)),
+                          ],
+                        ))),
+              ),
+            ),
+          ),
           SizedBox(height: 40),
           Container(
             child: Row(
@@ -360,7 +418,7 @@ class _HomePageState extends State<HomePage>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(language == "hi" ? "अध्याय" : "Chapters",
                         style: Themes.homeChapterHead.copyWith(
                             fontSize: 30,
@@ -368,30 +426,6 @@ class _HomePageState extends State<HomePage>
                             letterSpacing: 1.1,
                             fontFamily:
                                 language == "hi" ? "KrutiDev" : "Samarkan"))),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    elevation: 3,
-                    child: InkWell(
-                        onTap: () => showPicker(),
-                        child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 7, horizontal: 12),
-                            child: Text(
-                                language == "hi"
-                                    ? 'श्लोक चुनें'
-                                    : "Jump to Verse",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    letterSpacing: 1.1)))),
-                  ),
-                ),
               ],
             ),
           ),

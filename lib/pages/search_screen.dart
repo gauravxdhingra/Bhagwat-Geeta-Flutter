@@ -14,6 +14,8 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   Map searchResults = {};
   TextEditingController _searchController = TextEditingController();
+  bool startedSearching = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ]))));
     final provider = Provider.of<Scraper>(context, listen: false);
     searchResults = await provider.getSearchResults(query);
+    startedSearching = true;
     setState(() {});
     Navigator.pop(context);
     // loading = false;
@@ -44,17 +47,24 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         body: Stack(children: [
           CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
             SliverList(
                 delegate: SliverChildListDelegate([
               SizedBox(height: 80),
-              if (searchResults.length == 0) Container(),
+              if (searchResults.length == 0)
+                Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: startedSearching
+                            ? Text("No Results Found!")
+                            : Text("Start Searching..."))),
               if (searchResults.length != 0)
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: Text('${searchResults.length} Results'),
-                ),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    child: Text('${searchResults.length} Results')),
               for (int i = 0; i < searchResults.length; i++)
                 Padding(
                   padding:

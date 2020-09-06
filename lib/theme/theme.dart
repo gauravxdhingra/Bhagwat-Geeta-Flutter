@@ -9,4 +9,7 @@ class Themes {
       TextStyle(fontSize: 25, fontFamily: 'Samarkan', color: Colors.white);
   static const TextStyle homeChapterMeaning =
       TextStyle(fontSize: 18, fontFamily: 'Samarkan', color: Colors.white);
+  // URL
+  static const appUrl =
+      "https://play.google.com/store/apps/details?id=com.gauravxdhingra.shreemadbhagwatgeeta";
 }
