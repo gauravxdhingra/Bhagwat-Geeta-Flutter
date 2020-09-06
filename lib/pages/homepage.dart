@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -56,9 +57,9 @@ class _HomePageState extends State<HomePage>
 
     final _random = new Random();
     int next(int min, int max) => 1 + _random.nextInt(max - min);
-    int randomChap = next.call(1, 18);
+    randomChap = next.call(1, 18);
     int maxVerse = data[randomChap - 1]['$randomChap'].length;
-    int randomVerse = next.call(1, maxVerse);
+    randomVerse = next.call(1, maxVerse);
     print(maxVerse.toString());
     print(randomChap.toString() + " " + randomVerse.toString());
 
@@ -73,9 +74,6 @@ class _HomePageState extends State<HomePage>
       language = "hi";
       url = "https://bhagavadgita.io/hi";
     }
-
-    // randomChap = 1;
-    // randomVerse = 1;
 
     await getVerse("/chapter/$randomChap/verse/$randomVerse/");
 
@@ -223,9 +221,20 @@ class _HomePageState extends State<HomePage>
               title: Text("Share App"),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () async {
+                _launchURL() async {
+                  const url = 'https://flutter.dev';
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                }
+
+                await _launchURL();
+              },
               leading: Icon(Icons.star),
-              title: Text("Rate Us On Google Play"),
+              title: Text("Rate Us"),
             ),
           ],
         ),
@@ -237,59 +246,44 @@ class _HomePageState extends State<HomePage>
               physics: BouncingScrollPhysics(),
               slivers: [
                 SliverAppBar(
-                  expandedHeight: MediaQuery.of(context).size.width * 0.75,
-                  pinned: true,
-                  stretch: false,
-                  // elevation: 0,
-                  actions: [
-                    IconButton(
-                      icon: Icon(Icons.translate),
-                      onPressed: () async {
-                        // Navigator.pushNamed(context, SearchScreen.routeName);
-                        await changeLanguage();
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        Navigator.pushNamed(context, SearchScreen.routeName);
-                      },
-                    ),
-                  ],
-                  flexibleSpace: FlexibleSpaceBar(
-                    // titlePadding:
-                    //     EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    // centerTitle: true,
-                    collapseMode: CollapseMode.parallax,
-                    title: Container(
-                      padding: EdgeInsets.symmetric(),
-                      decoration: BoxDecoration(
-                          // color:
-                          //     Theme.of(context).primaryColor.withOpacity(0.6),
-                          borderRadius: BorderRadius.circular(4)),
-                      child: Text(
-                          language == "hi"
-                              ? "श्रीमद्भगवद्गीता"
-                              : "Bhagawad Geeta",
-                          style: TextStyle(
-                            fontFamily:
-                                language == "hi" ? 'KrutiDev' : 'Samarkan',
-                            // fontSize: language == "hi" ? 22 : 20,
-                            // letterSpacing: 1.1,
-                            // wordSpacing: 1.2
-                          )),
-                    ),
-                    background: Container(
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor),
-                      child: Container(
-                        child: Image.asset("assets/images/7.jpg",
-                            fit: BoxFit.cover),
-                      ),
-                    ),
-                  ),
-                ),
-                buildBody(context)
+                    expandedHeight: MediaQuery.of(context).size.width * 0.75,
+                    pinned: true,
+                    stretch: false,
+                    actions: [
+                      IconButton(
+                          icon: Icon(Icons.translate),
+                          onPressed: () async {
+                            await changeLanguage();
+                          }),
+                      IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, SearchScreen.routeName);
+                          })
+                    ],
+                    flexibleSpace: FlexibleSpaceBar(
+                        collapseMode: CollapseMode.parallax,
+                        title: Container(
+                            padding: EdgeInsets.symmetric(),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4)),
+                            child: Text(
+                                language == "hi"
+                                    ? "श्रीमद्भगवद्गीता"
+                                    : "Bhagawad Geeta",
+                                style: TextStyle(
+                                    fontFamily: language == "hi"
+                                        ? 'KrutiDev'
+                                        : 'Samarkan'))),
+                        background: Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor),
+                          child: Container(
+                              child: Image.asset("assets/images/7.jpg",
+                                  fit: BoxFit.cover)),
+                        ))),
+                buildBody(context),
               ],
             ),
     );
@@ -301,58 +295,61 @@ class _HomePageState extends State<HomePage>
         [
           SizedBox(height: 20),
           if (verseOfTheDay != null && verseOfTheDay != {})
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15)),
-              child: InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, VerseViewPage.routeName,
-                      arguments: {
-                        "verseUrl": "/chapter/$randomChap/verse/$randomVerse/"
-                      });
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 166,
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                          bottom: -5,
-                          right: -10,
-                          child: Icon(Icons.navigate_next,
-                              color: Colors.white, size: 35)),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                              language == "hi"
-                                  ? 'अध्याय $randomChap, श्लोक $randomVerse'
-                                  : 'Chapter $randomChap, Verse $randomVerse',
-                              style: Themes.homeChapterHead),
-                          SizedBox(height: 10),
-                          Text(verseOfTheDay["translation"],
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                              style: Themes.homeChapterMeaning.copyWith(
-                                  fontFamily: language == "hi"
-                                      ? 'KrutiDev'
-                                      : "Samarkan",
-                                  color: Colors.white.withOpacity(0.75))),
-                          SizedBox(height: 10),
-                        ],
-                      ),
-                    ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, VerseViewPage.routeName,
+                        arguments: {
+                          "verseUrl": "/chapter/$randomChap/verse/$randomVerse/"
+                        });
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 166,
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                            bottom: -5,
+                            right: -10,
+                            child: Icon(Icons.navigate_next,
+                                color: Colors.white, size: 35)),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                                language == "hi"
+                                    ? 'अध्याय $randomChap, श्लोक $randomVerse'
+                                    : 'Chapter $randomChap, Verse $randomVerse',
+                                style: Themes.homeChapterHead),
+                            SizedBox(height: 10),
+                            Text(verseOfTheDay["translation"],
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                                style: Themes.homeChapterMeaning.copyWith(
+                                    fontFamily: language == "hi"
+                                        ? 'KrutiDev'
+                                        : "Samarkan",
+                                    color: Colors.white.withOpacity(0.75))),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          SizedBox(height: 20),
+          SizedBox(height: 40),
           Container(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,

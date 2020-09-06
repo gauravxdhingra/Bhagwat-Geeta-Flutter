@@ -203,6 +203,8 @@ class _VerseViewPageState extends State<VerseViewPage> {
     setState(() {});
   }
 
+  GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -212,16 +214,14 @@ class _VerseViewPageState extends State<VerseViewPage> {
       },
       child: SafeArea(
         child: Scaffold(
+          key: _scaffoldKey,
           body: _isLoading
               ? Center(
                   child: Image.asset('assets/images/loading.gif', width: 125.0))
-              : CustomScrollView(
-                  physics: BouncingScrollPhysics(),
-                  slivers: [
-                    buildSliverAppBar(context),
-                    buildSliverBody(context)
-                  ],
-                ),
+              : CustomScrollView(physics: BouncingScrollPhysics(), slivers: [
+                  buildSliverAppBar(context),
+                  buildSliverBody(context)
+                ]),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerDocked,
           floatingActionButton: _isLoading

@@ -56,6 +56,7 @@ dependencies:
   custom_navigation_bar: ^0.2.7
   intl: ^0.16.1
   audio_service: ^0.14.1
+  url_launcher: ^5.5.2
 
 dev_dependencies:
   hive_generator: ^0.7.1

@@ -66,102 +66,107 @@ class _FavouritesPageState extends State<FavouritesPage> {
       body: loading
           ? Center(
               child: Image.asset('assets/images/loading.gif', width: 125.0))
-          : ListView.builder(
-              itemBuilder: (ctx, i) => Container(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                  child: Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    child: InkWell(
-                      onTap: () async {
-                        update = await Navigator.pushNamed(
-                            context, VerseViewPage.routeName, arguments: {
-                          "verseUrl": hive.get("fav").keys.elementAt(i)
-                        });
-                        if (update == true) setState(() {});
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 160,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(15)),
-                        child: Stack(
-                          children: [
-                            Positioned(
-                                bottom: -5,
-                                right: -10,
-                                child: Icon(Icons.navigate_next,
-                                    color: Colors.white, size: 35)),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                    lang == "hi"
-                                        ? "अध्याय " +
-                                            hive
-                                                .get("fav")
-                                                .keys
-                                                .elementAt(i)
-                                                .toString()
-                                                .split("/")[2] +
-                                            ", श्लोक " +
-                                            hive
-                                                .get("fav")
-                                                .keys
-                                                .elementAt(i)
-                                                .toString()
-                                                .split("/")[4]
-                                        : "Chapter " +
-                                            hive
-                                                .get("fav")
-                                                .keys
-                                                .elementAt(i)
-                                                .toString()
-                                                .split("/")[2] +
-                                            ", Verse " +
-                                            hive
-                                                .get("fav")
-                                                .keys
-                                                .elementAt(i)
-                                                .toString()
-                                                .split("/")[4],
-                                    style: Themes.homeChapterHead),
-                                SizedBox(height: 10),
-                                Text(
-                                    lang == "hi"
-                                        ? hive
-                                            .get("fav")
-                                            .values
-                                            .elementAt(i)["verseSanskrit"]
-                                        : hive
-                                            .get("fav")
-                                            .values
-                                            .elementAt(i)["translation"],
-                                    maxLines: 4,
-                                    style: Themes.homeChapterMeaning.copyWith(
-                                        fontSize: lang == "hi" ? 17 : 17,
-                                        fontFamily: lang == "hi"
-                                            ? 'KrutiDev'
-                                            : "Samarkan",
-                                        color: Colors.white.withOpacity(0.75))),
-                                SizedBox(height: 10),
-                              ],
-                            ),
-                          ],
+          : Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (ctx, i) => Container(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    child: Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15)),
+                      child: InkWell(
+                        onTap: () async {
+                          update = await Navigator.pushNamed(
+                              context, VerseViewPage.routeName, arguments: {
+                            "verseUrl": hive.get("fav").keys.elementAt(i)
+                          });
+                          if (update == true) setState(() {});
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 160,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 10),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(15)),
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                  bottom: -5,
+                                  right: -10,
+                                  child: Icon(Icons.navigate_next,
+                                      color: Colors.white, size: 35)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                      lang == "hi"
+                                          ? "अध्याय " +
+                                              hive
+                                                  .get("fav")
+                                                  .keys
+                                                  .elementAt(i)
+                                                  .toString()
+                                                  .split("/")[2] +
+                                              ", श्लोक " +
+                                              hive
+                                                  .get("fav")
+                                                  .keys
+                                                  .elementAt(i)
+                                                  .toString()
+                                                  .split("/")[4]
+                                          : "Chapter " +
+                                              hive
+                                                  .get("fav")
+                                                  .keys
+                                                  .elementAt(i)
+                                                  .toString()
+                                                  .split("/")[2] +
+                                              ", Verse " +
+                                              hive
+                                                  .get("fav")
+                                                  .keys
+                                                  .elementAt(i)
+                                                  .toString()
+                                                  .split("/")[4],
+                                      style: Themes.homeChapterHead),
+                                  SizedBox(height: 10),
+                                  Text(
+                                      lang == "hi"
+                                          ? hive
+                                              .get("fav")
+                                              .values
+                                              .elementAt(i)["verseSanskrit"]
+                                          : hive
+                                              .get("fav")
+                                              .values
+                                              .elementAt(i)["translation"],
+                                      maxLines: 4,
+                                      style: Themes.homeChapterMeaning.copyWith(
+                                          fontSize: lang == "hi" ? 17 : 17,
+                                          fontFamily: lang == "hi"
+                                              ? 'KrutiDev'
+                                              : "Samarkan",
+                                          color:
+                                              Colors.white.withOpacity(0.75))),
+                                  SizedBox(height: 10),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
+                itemCount: hive.get("fav").length,
               ),
-              itemCount: hive.get("fav").length,
             ),
     );
   }
