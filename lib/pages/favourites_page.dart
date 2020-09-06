@@ -64,8 +64,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
         ],
       ),
       body: loading
-          ? Center(
-              child: Image.asset('assets/images/loading.gif', width: 125.0))
+          ? Container()
           : Padding(
               padding: const EdgeInsets.only(top: 10),
               child: ListView.builder(

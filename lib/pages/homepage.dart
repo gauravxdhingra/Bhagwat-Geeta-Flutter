@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:bhagwat_geeta/pages/about_page.dart';
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
 import 'package:bhagwat_geeta/pages/verse_view_Page.dart';
@@ -211,7 +212,10 @@ class _HomePageState extends State<HomePage>
             ),
             ListTile(),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, AboutPage.routeName,
+                    arguments: true);
+              },
               leading: Icon(Icons.info),
               title: Text("About Bhagwat Geeta"),
             ),
@@ -381,7 +385,7 @@ class _HomePageState extends State<HomePage>
                             child: Text(
                                 language == "hi"
                                     ? 'श्लोक चुनें'
-                                    : "Go to Verse",
+                                    : "Jump to Verse",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
