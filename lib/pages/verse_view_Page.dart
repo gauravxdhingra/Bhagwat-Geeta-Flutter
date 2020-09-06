@@ -104,10 +104,17 @@ class _VerseViewPageState extends State<VerseViewPage> {
       final document = await provider.getWebpage(url);
       verse = provider.getFullVerse(document, eng: true);
     } else {
-      url = "https://bhagavadgita.io" + verseUrl + "hi/";
-      print(url);
-      final document = await provider.getWebpage(url);
-      verse = provider.getFullVerse(document, eng: false);
+      try {
+        url = "https://bhagavadgita.io" + verseUrl + "hi/";
+        print(url);
+        final document = await provider.getWebpage(url);
+        verse = provider.getFullVerse(document, eng: false);
+      } catch (e) {
+        url = "https://bhagavadgita.io" + verseUrl;
+        print(url);
+        final document = await provider.getWebpage(url);
+        verse = provider.getFullVerse(document, eng: true);
+      }
     }
   }
 
@@ -175,28 +182,20 @@ class _VerseViewPageState extends State<VerseViewPage> {
         });
   }
 
-  // addToFav() async {
-  //   List favs = hive.get("fav");
-  //   // print("1");
-  //   favs.add(verse);
-  //   // print("2");
-  //   // print(favs);
-  //   await hive.delete("fav");
-  //   await hive.put("fav", favs["fav"]);
-  //   print(hive.get("favs"));
-  //   print("3");
-  //   print(verseUrl);
-  //   print("4");
-  //   isFav = true;
-  //   // print(hive.get("fav").length);
-  //   setState(() {});
-  // }
+  addToFav() async {
+    Map favs = hive.get("fav") ?? {};
+    favs[verseUrl] = verse;
+    await hive.delete("fav");
+    await hive.put("fav", favs);
+    print(favs.length.toString() + "******");
+    print(verseUrl);
+    isFav = true;
+    setState(() {});
+  }
 
   removeFromFav() async {
     Map temp = {"fav": hive.get("fav")};
-
     temp["fav"].remove(verseUrl);
-
     hive.put("fav", temp["fav"]);
     print(temp["fav"]);
     isFav = false;
@@ -206,65 +205,77 @@ class _VerseViewPageState extends State<VerseViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: _isLoading
-            ? Center(
-                child: Image.asset('assets/images/loading.gif', width: 125.0))
-            : CustomScrollView(
-                physics: BouncingScrollPhysics(),
-                slivers: [buildSliverAppBar(context), buildSliverBody(context)],
-              ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: _isLoading
-            ? null
-            : Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    (verseUrl.split("/verse/")[1].split("/")[0] == "1")
-                        ? FloatingActionButton(
-                            heroTag: null,
-                            onPressed: null,
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Icon(Icons.navigate_before,
-                                color: Colors.transparent))
-                        : FloatingActionButton(
-                            heroTag: null,
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, VerseViewPage.routeName, arguments: {
-                                "verseUrl":
-                                    "/chapter/$chapterNo/verse/${verseNo - 1}/"
-                              });
-                            },
-                            backgroundColor: Themes.primaryColor,
-                            child: Icon(Icons.navigate_before)),
-                    (verseNo == data[chapterNo - 1]['$chapterNo'].length)
-                        ? FloatingActionButton(
-                            heroTag: null,
-                            onPressed: null,
-                            elevation: 0,
-                            backgroundColor: Colors.transparent,
-                            child: Icon(Icons.navigate_before,
-                                color: Colors.transparent))
-                        : FloatingActionButton(
-                            heroTag: null,
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                  context, VerseViewPage.routeName, arguments: {
-                                "verseUrl":
-                                    "/chapter/$chapterNo/verse/${verseNo + 1}/"
-                              });
-                            },
-                            backgroundColor: Themes.primaryColor,
-                            child: Icon(Icons.navigate_next))
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, true);
+        return true;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          body: _isLoading
+              ? Center(
+                  child: Image.asset('assets/images/loading.gif', width: 125.0))
+              : CustomScrollView(
+                  physics: BouncingScrollPhysics(),
+                  slivers: [
+                    buildSliverAppBar(context),
+                    buildSliverBody(context)
                   ],
                 ),
-              ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: _isLoading
+              ? null
+              : Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      (verseUrl.split("/verse/")[1].split("/")[0] == "1")
+                          ? FloatingActionButton(
+                              heroTag: null,
+                              onPressed: null,
+                              elevation: 0,
+                              backgroundColor: Colors.transparent,
+                              child: Icon(Icons.navigate_before,
+                                  color: Colors.transparent))
+                          : FloatingActionButton(
+                              heroTag: null,
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, VerseViewPage.routeName,
+                                    arguments: {
+                                      "verseUrl":
+                                          "/chapter/$chapterNo/verse/${verseNo - 1}/"
+                                    });
+                              },
+                              backgroundColor: Themes.primaryColor,
+                              child: Icon(Icons.navigate_before)),
+                      (verseNo == data[chapterNo - 1]['$chapterNo'].length)
+                          ? FloatingActionButton(
+                              heroTag: null,
+                              onPressed: null,
+                              elevation: 0,
+                              backgroundColor: Colors.transparent,
+                              child: Icon(Icons.navigate_before,
+                                  color: Colors.transparent))
+                          : FloatingActionButton(
+                              heroTag: null,
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(
+                                    context, VerseViewPage.routeName,
+                                    arguments: {
+                                      "verseUrl":
+                                          "/chapter/$chapterNo/verse/${verseNo + 1}/"
+                                    });
+                              },
+                              backgroundColor: Themes.primaryColor,
+                              child: Icon(Icons.navigate_next))
+                    ],
+                  ),
+                ),
+        ),
       ),
     );
   }
@@ -278,7 +289,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
       leading: IconButton(
         icon: Icon(Icons.arrow_back_ios),
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         },
       ),
       actions: [
@@ -294,7 +305,7 @@ class _VerseViewPageState extends State<VerseViewPage> {
               : Icon(Icons.favorite),
           onPressed: isFav == null || isFav == false
               ? () async {
-                  // await addToFav();
+                  await addToFav();
                 }
               : () async {
                   await removeFromFav();

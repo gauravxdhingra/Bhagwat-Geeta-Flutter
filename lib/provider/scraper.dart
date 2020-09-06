@@ -72,9 +72,7 @@ class Scraper with ChangeNotifier {
           title.split("Chapter")[1].split(",")[0] +
           ", " +
           "श्लोक" +
-          title.split("Verse")[1];
-      // title.replaceAll("Chapter", "अध्याय");
-      // title.replaceAll("Verse", "श्लोक");
+          title.split("Verse")[1]; 
       print(title);
     }
 
@@ -84,10 +82,6 @@ class Scraper with ChangeNotifier {
           document.getElementsByClassName("verse-transliteration")[0].text;
     wordMeanings = document.getElementsByClassName("verse-word")[0].text;
     translation = document.getElementsByClassName("verse-meaning")[0].text;
-
-    // No Transliteration for Hindi
-    // शब्दार्थ   word meanings
-    // अनुवाद   translation
 
     verse = {
       "title": title,

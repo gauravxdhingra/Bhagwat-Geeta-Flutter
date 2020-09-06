@@ -78,9 +78,9 @@ void main() async {
       x.put("blurhash", blurhash);
       // print(x.toMap());
     });
-  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-  //   statusBarColor: primaryColor,
-  // ));
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: primaryColor,
+  ));
   runApp(MyApp());
 }
 

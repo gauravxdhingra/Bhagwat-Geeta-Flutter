@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bhagwat_geeta/pages/chapter_view_page.dart';
 import 'package:bhagwat_geeta/pages/search_screen.dart';
@@ -24,14 +25,19 @@ class _HomePageState extends State<HomePage>
   bool init = false;
 
   Map<String, String> chapters = {};
+  Map verseOfTheDay = {};
+  int randomChap = 1;
+  int randomVerse = 1;
   Box<Map> x;
   String url = "";
   Scraper provider;
+  var data;
 
   @override
   void didChangeDependencies() async {
     if (!init) {
       provider = Provider.of<Scraper>(context);
+      data = JsonDecoder().convert(PickerData);
       await getData();
       setState(() {
         _isLoading = false;
@@ -47,6 +53,15 @@ class _HomePageState extends State<HomePage>
   getData() async {
     x = await Hive.openBox<Map>("Geeta");
     lang = x.get("lang");
+
+    final _random = new Random();
+    int next(int min, int max) => 1 + _random.nextInt(max - min);
+    int randomChap = next.call(1, 18);
+    int maxVerse = data[randomChap - 1]['$randomChap'].length;
+    int randomVerse = next.call(1, maxVerse);
+    print(maxVerse.toString());
+    print(randomChap.toString() + " " + randomVerse.toString());
+
     if (lang == null || lang.toString() == "") {
       language = "eng";
       x.put("lang", {"lang": "eng"});
@@ -58,8 +73,38 @@ class _HomePageState extends State<HomePage>
       language = "hi";
       url = "https://bhagavadgita.io/hi";
     }
+
+    // randomChap = 1;
+    // randomVerse = 1;
+
+    await getVerse("/chapter/$randomChap/verse/$randomVerse/");
+
+    print(randomChap.toString() + " " + randomVerse.toString());
     final document = await provider.getWebpage(url);
     chapters = await provider.getChapters(document);
+  }
+
+  getVerse(verseUrl) async {
+    String url = "https://bhagavadgita.io" + verseUrl;
+    if (x.toMap()["lang"]["lang"] == "eng") {
+      url = "https://bhagavadgita.io" + verseUrl;
+      print(url);
+      final document = await provider.getWebpage(url);
+      verseOfTheDay = provider.getFullVerse(document, eng: true);
+    } else {
+      try {
+        url = "https://bhagavadgita.io" + verseUrl + "hi/";
+        print(url);
+        final document = await provider.getWebpage(url);
+        verseOfTheDay = provider.getFullVerse(document, eng: false);
+      } catch (e) {
+        url = "https://bhagavadgita.io" + verseUrl;
+        print(url);
+        final document = await provider.getWebpage(url);
+        verseOfTheDay = provider.getFullVerse(document, eng: true);
+      }
+    }
+    print(verseOfTheDay);
   }
 
   changeLanguage() async {
@@ -175,24 +220,19 @@ class _HomePageState extends State<HomePage>
             ListTile(
               onTap: () {},
               leading: Icon(Icons.share_rounded),
-              title: Text("Share This App"),
+              title: Text("Share App"),
             ),
             ListTile(
               onTap: () {},
               leading: Icon(Icons.star),
-              title: Text("Rate Us on Google Play"),
+              title: Text("Rate Us On Google Play"),
             ),
           ],
         ),
       ),
       body: _isLoading
           ? Center(
-              child: Image.asset(
-                'assets/images/loading.gif',
-                // height: 125.0,
-                width: 125.0,
-              ),
-            )
+              child: Image.asset('assets/images/loading.gif', width: 125.0))
           : CustomScrollView(
               physics: BouncingScrollPhysics(),
               slivers: [
@@ -232,11 +272,12 @@ class _HomePageState extends State<HomePage>
                               ? "श्रीमद्भगवद्गीता"
                               : "Bhagawad Geeta",
                           style: TextStyle(
-                              fontFamily:
-                                  language == "hi" ? 'KrutiDev' : 'Samarkan',
-                              // fontSize: language == "hi" ? 22 : 20,
-                              // letterSpacing: 1.1,
-                              wordSpacing: 1.2)),
+                            fontFamily:
+                                language == "hi" ? 'KrutiDev' : 'Samarkan',
+                            // fontSize: language == "hi" ? 22 : 20,
+                            // letterSpacing: 1.1,
+                            // wordSpacing: 1.2
+                          )),
                     ),
                     background: Container(
                       decoration: BoxDecoration(
@@ -258,7 +299,60 @@ class _HomePageState extends State<HomePage>
     return SliverList(
       delegate: SliverChildListDelegate(
         [
-          SizedBox(height: 40),
+          SizedBox(height: 20),
+          if (verseOfTheDay != null && verseOfTheDay != {})
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, VerseViewPage.routeName,
+                      arguments: {
+                        "verseUrl": "/chapter/$randomChap/verse/$randomVerse/"
+                      });
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 166,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                          bottom: -5,
+                          right: -10,
+                          child: Icon(Icons.navigate_next,
+                              color: Colors.white, size: 35)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                              language == "hi"
+                                  ? 'अध्याय $randomChap, श्लोक $randomVerse'
+                                  : 'Chapter $randomChap, Verse $randomVerse',
+                              style: Themes.homeChapterHead),
+                          SizedBox(height: 10),
+                          Text(verseOfTheDay["translation"],
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
+                              style: Themes.homeChapterMeaning.copyWith(
+                                  fontFamily: language == "hi"
+                                      ? 'KrutiDev'
+                                      : "Samarkan",
+                                  color: Colors.white.withOpacity(0.75))),
+                          SizedBox(height: 10),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          SizedBox(height: 20),
           Container(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -278,7 +372,7 @@ class _HomePageState extends State<HomePage>
                   child: Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
-                    elevation: 2,
+                    elevation: 3,
                     child: InkWell(
                         onTap: () => showPicker(),
                         child: Container(
