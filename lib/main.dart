@@ -21,6 +21,7 @@ import 'provider/scraper.dart';
 const primaryColor = Color(0xffff5521);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  debugPrint = (String message, {int wrapWidth}) {};
   Directory document = await getApplicationDocumentsDirectory();
   Hive.init(document.path);
 

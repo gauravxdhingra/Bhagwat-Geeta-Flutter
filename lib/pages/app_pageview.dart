@@ -30,14 +30,16 @@ class _AppPageviewState extends State<AppPageview> {
                   content: Text("Are you sure?"),
                   actions: [
                     FlatButton(
-                      child: Text("No"),
+                      child: Text("No",
+                          style: TextStyle(color: Themes.primaryColor)),
                       onPressed: () {
                         Navigator.pop(context);
                         returnIf = false;
                       },
                     ),
                     FlatButton(
-                      child: Text("Yes"),
+                      child: Text("Yes",
+                          style: TextStyle(color: Themes.primaryColor)),
                       onPressed: () {
                         Navigator.pop(context);
                         returnIf = true;
