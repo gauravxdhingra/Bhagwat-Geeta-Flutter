@@ -52,7 +52,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
 
   Future<String> saveToDevice() async {
     if (_imageFile == null) {
-      await screenshotController.capture(pixelRatio: 2.5).then((File image) {
+      await screenshotController.capture(pixelRatio: 2.2).then((File image) {
         setState(() {
           _imageFile = image;
         });
@@ -60,32 +60,18 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
         print(onError);
       });
     }
-    Uint8List save = await _imageFile.readAsBytes();
-    print(title);
-    // var path = await getExternalStorageDirectory();
-    // print(path.path);
-    // var pathPath = path.path + lang == "eng"
-    //     ? "Bhagwat Geeta - $title"
-    //     : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi";
-    // print(pathPath);
 
-    // GallerySaver.saveImage(pathPath, albumName: "Shreemad Bhagwat Geeta")
-    //     .then((path) {
-    //   print(pathPath);
-    //   setState(() {
-    //     // firstButtonText = 'image saved!';
-    //   });
-    // });
+    // Uint8List save = await _imageFile.readAsBytes();
+    print(title);
+    String fileName = lang == "eng"
+        ? "Bhagwat Geeta - $title"
+        : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi";
+    var path = await getExternalStorageDirectory();
+
+    await _imageFile.copy(path.path + "/" + fileName + ".jpg");
+
     print("*************");
-    final result = await ImageGallerySaver.saveImage(save,
-        quality: 100,
-        name: lang == "eng"
-            ? "Bhagwat Geeta - $title"
-            : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi");
-    print("*************");
-    print(result);
-    return result;
-    // .toString().replaceAll("%20", " ").replaceAll("%2C", ",");
+    return path.path + "/" + fileName + ".jpg";
   }
 
   @override
@@ -245,19 +231,15 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                               onPressed: () async {
                                 var res = await saveToDevice();
                                 print(res);
-                                var resDir = Directory.fromUri(Uri.parse(res));
-                                // res
-                                //     .split("file://")[1]
-                                //     .replaceAll("%20", " ")
-                                //     .replaceAll("%2C", ",");
-                                Share.shareFiles([resDir.path],
+
+                                Share.shareFiles([res],
                                     text: "Bhagwat Geeta\n" +
                                         title +
                                         "\n\n" +
                                         verseSanskrit.trim() +
                                         "\n\n" +
                                         translation.trim() +
-                                        "\n\n Download From Google Play\n url");
+                                        "\n\nDownload Shreemad Bhagwat Geeta from Google Play\nhttps://play.google.com/store/apps/details?id=com.gauravxdhingra.shreemadbhagwatgeeta");
                               },
                             ),
                           ],

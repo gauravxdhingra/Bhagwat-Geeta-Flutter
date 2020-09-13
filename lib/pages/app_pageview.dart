@@ -22,8 +22,31 @@ class _AppPageviewState extends State<AppPageview> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        
-        return true;
+        bool returnIf = false;
+        await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text("Quit"),
+                  content: Text("Are you sure?"),
+                  actions: [
+                    FlatButton(
+                      child: Text("No"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        returnIf = false;
+                      },
+                    ),
+                    FlatButton(
+                      child: Text("Yes"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        returnIf = true;
+                      },
+                    ),
+                  ],
+                ));
+        print(returnIf);
+        return returnIf;
       },
       child: SafeArea(
         child: Scaffold(
@@ -32,8 +55,24 @@ class _AppPageviewState extends State<AppPageview> {
             physics: NeverScrollableScrollPhysics(),
             children: [
               HomePage(),
-              FavouritesPage(),
-              SettingsPage(),
+              WillPopScope(
+                  onWillPop: () async {
+                    setState(() {
+                      _controller.jumpToPage(0);
+                      index = 0;
+                    });
+                    return false;
+                  },
+                  child: FavouritesPage()),
+              WillPopScope(
+                  onWillPop: () async {
+                    setState(() {
+                      _controller.jumpToPage(0);
+                      index = 0;
+                    });
+                    return false;
+                  },
+                  child: SettingsPage()),
             ],
           ),
           bottomNavigationBar: Container(

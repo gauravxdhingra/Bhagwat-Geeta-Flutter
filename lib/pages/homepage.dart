@@ -292,18 +292,9 @@ class _HomePageState extends State<HomePage>
                     flexibleSpace: FlexibleSpaceBar(
                         collapseMode: CollapseMode.parallax,
                         title: Container(
-                          padding: EdgeInsets.symmetric(),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4)),
-                          // child: Text(
-                          //     language == "hi"
-                          //         ? "श्रीमद्भगवद्गीता"
-                          //         : "Bhagawad Geeta",
-                          //     style: TextStyle(
-                          //         fontFamily: language == "hi"
-                          //             ? 'KrutiDev'
-                          //             : 'Samarkan'))
-                        ),
+                            padding: EdgeInsets.symmetric(),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4))),
                         background: Container(
                           decoration: BoxDecoration(
                               color: Theme.of(context).scaffoldBackgroundColor),
