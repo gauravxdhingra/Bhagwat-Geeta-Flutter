@@ -59,6 +59,7 @@ dependencies:
   url_launcher: ^5.5.2
   rename: ^1.2.0
   flutter_rename_app: ^1.0.0
+  gallery_saver: ^2.0.1
 
 dev_dependencies:
   hive_generator: ^0.7.1
@@ -70,7 +71,7 @@ dev_dependencies:
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/icon.png"    
+  image_path: "assets/images/icon.png"
 
 flutter_rename_app:
   application_name: Shreemad Bhagwat Geeta

@@ -9,6 +9,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
+import 'package:gallery_saver/gallery_saver.dart';
 
 class ScreenshotScreen extends StatefulWidget {
   ScreenshotScreen({Key key}) : super(key: key);
@@ -60,14 +61,31 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
       });
     }
     Uint8List save = await _imageFile.readAsBytes();
+    print(title);
+    // var path = await getExternalStorageDirectory();
+    // print(path.path);
+    // var pathPath = path.path + lang == "eng"
+    //     ? "Bhagwat Geeta - $title"
+    //     : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi";
+    // print(pathPath);
+
+    // GallerySaver.saveImage(pathPath, albumName: "Shreemad Bhagwat Geeta")
+    //     .then((path) {
+    //   print(pathPath);
+    //   setState(() {
+    //     // firstButtonText = 'image saved!';
+    //   });
+    // });
+    print("*************");
     final result = await ImageGallerySaver.saveImage(save,
         quality: 100,
         name: lang == "eng"
             ? "Bhagwat Geeta - $title"
             : "Bhagwat Geeta - ${title.replaceAll("अध्याय", "Chapter").replaceAll("श्लोक", "Verse")} - Hindi");
-    print(title);
+    print("*************");
     print(result);
-    return result.toString().replaceAll("%20", " ").replaceAll("%2C", ",");
+    return result;
+    // .toString().replaceAll("%20", " ").replaceAll("%2C", ",");
   }
 
   @override
@@ -216,8 +234,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                                 onPressed: () async {
                                   await saveToDevice();
                                   final SnackBar snackBar = SnackBar(
-                                    content: Text("Saved To Gallery"),
-                                  );
+                                      content: Text("Saved To Gallery"));
                                   _scaffoldKey.currentState
                                       .showSnackBar(snackBar);
                                 }),
@@ -227,12 +244,13 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                               iconSize: 33,
                               onPressed: () async {
                                 var res = await saveToDevice();
-
-                                res = res
-                                    .split("file://")[1]
-                                    .replaceAll("%20", " ")
-                                    .replaceAll("%2C", ",");
-                                Share.shareFiles([res],
+                                print(res);
+                                var resDir = Directory.fromUri(Uri.parse(res));
+                                // res
+                                //     .split("file://")[1]
+                                //     .replaceAll("%20", " ")
+                                //     .replaceAll("%2C", ",");
+                                Share.shareFiles([resDir.path],
                                     text: "Bhagwat Geeta\n" +
                                         title +
                                         "\n\n" +
